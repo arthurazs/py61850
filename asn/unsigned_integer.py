@@ -1,12 +1,13 @@
 from struct import pack as s_pack, unpack as s_unpack
+from asn.generic_asn import GenericASN
 
 U8 = 255
 U16 = 65535
-U24 = 16777215
+# U24 = 16777215
 U32 = 4294967295
 
 
-class UnsignedInt:
+class UnsignedInt(GenericASN):
     
     TAG = b'\x86'
 
@@ -20,29 +21,17 @@ class UnsignedInt:
             return UnsignedInt.TAG + b'\x01' + s_pack('>B', value)
         elif value <= U16:
             return UnsignedInt.TAG + b'\x02' + s_pack('>H', value)
-        elif value <= U24:
-            return UnsignedInt.TAG + b'\x03' + s_pack('>I', value)[1:]
+        # elif value <= U24:
+        # #     # NOTE regular MMS does not have 24 bits unsigned int
+        # #     # NOTE 24 bits unsigned int seems to be used only for timestamp
+        #     return UnsignedInt.TAG + b'\x03' + s_pack('>I', value)[1:]
         elif value <= U32:
             return UnsignedInt.TAG + b'\x04' + s_pack('>I', value)
         raise ValueError('Unsigned integer out of supported range')
 
     @staticmethod
     def unpack(value):
-        tag = value[0:1]
-        try:
-            size = value[1]
-        except IndexError:
-            raise ValueError(f'{value} is missing length field')
-        number = value[2:]
-
-        if tag != UnsignedInt.TAG:
-            raise TypeError(f'{value} is not an unsigned integer')
-
-        if size < len(number):
-            raise ValueError(f'{value} seems to be incomplete')
-
-        if size > len(number):
-            raise ValueError(f'{value} seems to have extra information')
+        tag, size, number = UnsignedInt.get_asn(value)
 
         if size == 0:
             return None
@@ -50,8 +39,10 @@ class UnsignedInt:
             return s_unpack('>B', number)[0]
         elif size == 2:
             return s_unpack('>H', number)[0]
-        elif size == 3:
-            return s_unpack('>I', b'\x00' + number)[0]
+        # elif size == 3:
+        #     # NOTE regular MMS does not have 24 bits unsigned int
+        #     # NOTE 24 bits unsigned int seems to be used only for timestamp
+        #     return s_unpack('>I', b'\x00' + number)[0]
         elif size == 4:
             return s_unpack('>I', number)[0]
         raise ValueError('Unsigned integer out of supported range')
