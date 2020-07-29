@@ -23,9 +23,9 @@ class GenericASN:
         if length < U7:
             packed_length = s_pack('>B', length)
         elif U7 <= length < U8:
-            packed_length = s_pack(f'>BB', U7 + 1, length)
+            packed_length = s_pack('>BB', U7 + 1, length)
         elif U8 <= length < U16:
-            packed_length = s_pack(f'>BH', U7 + 2, length)
+            packed_length = s_pack('>BH', U7 + 2, length)
         else:
             raise ValueError(f'GenericASN.generic_pack: packed_data length greater than {U16 - 1}')
 
