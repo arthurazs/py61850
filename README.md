@@ -6,6 +6,9 @@ IEC 61850 in Python 3.
 
 According to IEC 61850 parts 7-2, 8-1 and 9-2, and ISO 9506 parts 1 and 2. 
 
+- [ ] Exceptions
+  - [ ] Add custom exceptions
+  - [ ] Review every exception message
 - [ ] Basic Types
   - [X] Boolean
   - [X] Unsigned Integer (ISO)
