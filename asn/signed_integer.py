@@ -16,7 +16,7 @@ class SignedInt(GenericASN):
                 return SignedInt.generic_pack(s_pack('>h', data))
             elif N32 <= data <= P32:
                 return SignedInt.generic_pack(s_pack('>i', data))
-            elif N64 <= data <= P64:
+            elif N64 <= data <= P64:  # NOTE change support from 64 to 128?
                 return SignedInt.generic_pack(s_pack('>q', data))
             raise ValueError('Signed integer out of supported range')
         raise ValueError('Cannot pack non-int value')

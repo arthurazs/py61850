@@ -8,6 +8,7 @@ class VisibleString(GenericASN):
     @staticmethod
     def pack(data):
         if isinstance(data, (str, type(None), )):
+            # NOTE should it be null terminated?
             try:
                 string = data.encode('utf8')
             except AttributeError:
