@@ -1,4 +1,3 @@
-from struct import pack as s_pack, unpack as s_unpack
 from asn.generic_asn import GenericASN
 
 
