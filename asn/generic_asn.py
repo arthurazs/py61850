@@ -32,28 +32,42 @@ class GenericASN:
         return packed_tag + packed_length + packed_data
 
     @classmethod
-    def generic_unpack(cls, data):
-        if data[0:1] != cls.TAG:
-            raise TypeError(f'{data} is not of the {cls.TAG} type')
+    def _assert_tag(cls, data):
+        tag = data[0:1]
+        remainder = data[1:]
+        if tag != cls.TAG:
+            raise TypeError(f'{tag} is not of the {cls.TAG} type')
+        return tag, remainder
 
+    @classmethod
+    def _unpack_length(cls, data):
         try:
-            length = data[1]
-            extra_length = 0
-            if length > U7:
-                extra_length = length % U7
-                if extra_length == 1:
-                    length = s_unpack('>B', data[2:3])[0]
-                elif extra_length == 2:
-                    length = s_unpack('>H', data[2:4])[0]
-                elif extra_length == 4:
-                    length = s_unpack('>I', data[2:6])[0]
-                elif extra_length == 8:
-                    length = s_unpack('>Q', data[2:8])[0]
-
+            length = data[0]
         except IndexError:
             raise ValueError(f'{data} is missing length field')
 
-        value = data[2 + extra_length:]
+        extra_length = 0
+        if length > U7:
+            extra_length = length % U7
+            if extra_length == 1:
+                length = s_unpack('>B', data[1:2])[0]
+            elif extra_length == 2:
+                length = s_unpack('>H', data[1:3])[0]
+            elif extra_length == 4:
+                length = s_unpack('>I', data[1:5])[0]
+            elif extra_length == 8:
+                length = s_unpack('>Q', data[1:9])[0]
+            else:
+                raise NotImplementedError('TODO')
+
+        return length, extra_length, data[extra_length + 1:]
+
+    @classmethod
+    def generic_unpack(cls, data):
+        _, data = cls._assert_tag(data)
+
+        length, extra_length, value = cls._unpack_length(data)
+
         if length < len(value):
             raise ValueError(f'{data} seems to be incomplete')
 
