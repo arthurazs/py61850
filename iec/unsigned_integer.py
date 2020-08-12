@@ -1,9 +1,9 @@
 from struct import pack as s_pack, unpack as s_unpack
-from asn.generic_asn import GenericASN
-from asn.utils import U8, U16, U32
+from iec.generic_iec import GenericIEC
+from iec.utils import U8, U16, U32
 
 
-class UnsignedInt(GenericASN):
+class UnsignedInt(GenericIEC):
 
     TAG = b'\x86'
 

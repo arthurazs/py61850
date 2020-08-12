@@ -1,6 +1,6 @@
 import unittest
-from asn.unsigned_integer import UnsignedInt
-from asn.utils import U8, U16, U32
+from iec.unsigned_integer import UnsignedInt
+from iec.utils import U8, U16, U32
 
 
 class TestIntegerPack(unittest.TestCase):

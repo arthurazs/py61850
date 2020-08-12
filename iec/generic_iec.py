@@ -1,8 +1,8 @@
 from struct import pack as s_pack, unpack as s_unpack
-from asn.utils import U7, U8, U16
+from iec.utils import U7, U8, U16
 
 
-class GenericASN:
+class GenericIEC:
 
     TAG = None
 
@@ -27,7 +27,7 @@ class GenericASN:
         elif U8 <= length < U16:
             packed_length = s_pack('>BH', U7 + 2, length)
         else:
-            raise ValueError(f'GenericASN.generic_pack: packed_data length greater than {U16 - 1}')
+            raise ValueError(f'{cls.__name__}.generic_pack: packed_data length greater than {U16 - 1}')
 
         return packed_tag + packed_length + packed_data
 

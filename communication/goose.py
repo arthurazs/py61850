@@ -1,9 +1,9 @@
 from socket import socket, AF_PACKET, SOCK_RAW
 from sys import argv
 from struct import pack
-from asn.visible_string import VisibleString
-from asn.boolean import Boolean
-from asn.signed_integer import SignedInt
+from iec.visible_string import VisibleString
+from iec.boolean import Boolean
+from iec.signed_integer import SignedInt
 
 
 def pack_data(tag, data):

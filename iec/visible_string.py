@@ -1,7 +1,7 @@
-from asn.generic_asn import GenericASN
+from iec.generic_iec import GenericIEC
 
 
-class VisibleString(GenericASN):
+class VisibleString(GenericIEC):
 
     TAG = b'\x8A'
 
