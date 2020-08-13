@@ -8,8 +8,13 @@ According to IEC 61850 parts 7-2, 8-1 and 9-2, and ISO 9506 parts 1 and 2.
 
 - [ ] Exceptions
   - [ ] Add custom exceptions
+    - [ ] TagError
+    - [ ] LengthError
+    - [ ] RangeError
   - [ ] Review every exception message
 - [ ] Basic Types
+  - [ ] Make sure data returns only the specified length, e.g.:
+    - `data[1:5]` instead of `data[1:]` 
   - [X] Boolean
   - [X] Unsigned Integer (ISO)
     - [ ] Enumerated (IEC)
@@ -21,6 +26,8 @@ According to IEC 61850 parts 7-2, 8-1 and 9-2, and ISO 9506 parts 1 and 2.
   - [ ] Time Stamp
   - [ ] Time of Day (ISO) | Entry Time (IEC)  
   - [ ] Bit String (ISO) | Coded Enum (IEC)
+
+Should py61850 support raw MMS (ISO)?
 
 ## GOOSE
 
