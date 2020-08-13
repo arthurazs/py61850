@@ -17,17 +17,17 @@ class GenericIEC:
     @classmethod
     def generic_pack(cls, packed_data):
         packed_tag = cls.TAG
-        if not packed_data:
+        if packed_data is None:
             return packed_tag + b'\x00'
         length = len(packed_data)
         if length < U7:
-            packed_length = s_pack('>B', length)
+            packed_length = s_pack('!B', length)
         elif U7 <= length < U8:
-            packed_length = s_pack('>BB', U7 + 1, length)
+            packed_length = s_pack('!BB', U7 + 1, length)
         elif U8 <= length < U16:
-            packed_length = s_pack('>BH', U7 + 2, length)
+            packed_length = s_pack('!BH', U7 + 2, length)
         else:
-            raise ValueError(f'{cls.__name__}.generic_pack: packed_data length greater than {U16 - 1}')
+            raise ValueError(f'{cls.__name__}.generic_pack: packed_data length greater than {U16}')
 
         return packed_tag + packed_length + packed_data
 
@@ -49,15 +49,16 @@ class GenericIEC:
         extra_length = 0
         if length > U7:
             extra_length = length % U7
+            # NOTE is it supposed to unpack extra length of 3, 5, 6, etc?
             if extra_length == 1:
-                length = s_unpack('>B', data[1:2])[0]
+                length = s_unpack('!B', data[1:2])[0]
             elif extra_length == 2:
-                length = s_unpack('>H', data[1:3])[0]
+                length = s_unpack('!H', data[1:3])[0]
             elif extra_length == 4:
-                length = s_unpack('>I', data[1:5])[0]
+                length = s_unpack('!I', data[1:5])[0]
             elif extra_length == 8:  # pragma: no cover
-                # not worth to test (cpu intensive)
-                length = s_unpack('>Q', data[1:9])[0]
+                # not worth to test (too cpu intensive)
+                length = s_unpack('!Q', data[1:9])[0]
             else:
                 raise NotImplementedError('TODO')
 
@@ -71,8 +72,7 @@ class GenericIEC:
 
         if length < len(value):
             raise ValueError(f'{data} seems to be incomplete')
-
-        if length > len(value):
+        elif length > len(value):
             raise ValueError(f'{data} seems to have extra information')
 
         return length, value
