@@ -7,3 +7,7 @@ venv/
 # python
 __pycache__/
 *.pyc
+
+# coverage
+htmlcov/
+.coverage
