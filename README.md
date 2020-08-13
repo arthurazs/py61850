@@ -19,7 +19,7 @@ According to IEC 61850 parts 7-2, 8-1 and 9-2, and ISO 9506 parts 1 and 2.
   - [X] Unsigned Integer (ISO)
     - [ ] Enumerated (IEC)
   - [X] Signed Integer
-  - [ ] Floating Point
+  - [X] Floating Point
   - [X] Visible String
   - [ ] Octet String
   - [ ] MMS String (ISO) | Unicode String (IEC)
