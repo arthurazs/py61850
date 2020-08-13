@@ -1,6 +1,6 @@
 import unittest
 from iec.generic_iec import GenericIEC
-from iec.utils import U7, U8, U16
+from iec.utils import U7, U8, U16, U32
 
 
 class TestGenericIECGenPack(unittest.TestCase):
@@ -50,11 +50,27 @@ class TestGenericIECGenUnpack(unittest.TestCase):
     def test_unpack_bigger_size(self):
         self.assertRaises(ValueError, GenericIEC.generic_unpack, b'\x86\x03\xFF\xFF\xFF\xFF')
 
-    def test_unpack_extra_length(self):
-        length = U7 + 1
+    def test_unpack_extra_length_1(self):
+        length = U7
         string = b'a' * length
 
-        actual = GenericIEC.generic_unpack(b'\x86\x81\x81' + string)
+        actual = GenericIEC.generic_unpack(b'\x86\x81\x80' + string)
+        expected = (length, string)
+        self.assertEqual(actual, expected)
+
+    def test_unpack_extra_length_2(self):
+        length = U8
+        string = b'a' * length
+
+        actual = GenericIEC.generic_unpack(b'\x86\x82\x01\x00' + string)
+        expected = (length, string)
+        self.assertEqual(actual, expected)
+
+    def test_unpack_extra_length_4(self):
+        length = U16
+        string = b'a' * length
+
+        actual = GenericIEC.generic_unpack(b'\x86\x84\x00\x01\x00\x00' + string)
         expected = (length, string)
         self.assertEqual(actual, expected)
 

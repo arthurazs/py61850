@@ -7,11 +7,11 @@ class GenericIEC:
     TAG = None
 
     @staticmethod
-    def pack(data):
+    def pack(data):  # pragma: no cover
         raise NotImplementedError
 
     @staticmethod
-    def unpack(data):
+    def unpack(data):  # pragma: no cover
         raise NotImplementedError
 
     @classmethod
@@ -55,7 +55,8 @@ class GenericIEC:
                 length = s_unpack('>H', data[1:3])[0]
             elif extra_length == 4:
                 length = s_unpack('>I', data[1:5])[0]
-            elif extra_length == 8:
+            elif extra_length == 8:  # pragma: no cover
+                # not worth to test (cpu intensive)
                 length = s_unpack('>Q', data[1:9])[0]
             else:
                 raise NotImplementedError('TODO')
@@ -66,7 +67,7 @@ class GenericIEC:
     def generic_unpack(cls, data):
         _, data = cls._assert_tag(data)
 
-        length, extra_length, value = cls._unpack_length(data)
+        length, _, value = cls._unpack_length(data)
 
         if length < len(value):
             raise ValueError(f'{data} seems to be incomplete')

@@ -13,8 +13,8 @@ class TestVisibleStringPack(unittest.TestCase):
     def test_pack_huge_string(self):
         self.assertEqual(VisibleString.pack('a' * (U8 - 1)), b'\x8A\x81\xFF' + (b'a' * (U8 - 1)))
 
-    # def test_pack_out_of_range(self):
-    #     self.assertRaises(ValueError, VisibleString.pack, 'a' * U8)
+    def test_pack_wrong_value(self):
+        self.assertRaises(ValueError, VisibleString.pack, 123)
 
 
 class TestVisibleStringUnpack(unittest.TestCase):
