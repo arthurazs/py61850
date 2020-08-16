@@ -29,12 +29,14 @@ According to IEC 61850 parts 7-2, 8-1 and 9-2, and ISO 9506 parts 1 and 2.
 
 Should py61850 support raw MMS (ISO)?
 
+Should py61850 log what is happening? This might decrease performance.
+
 ## GOOSE
 
 You can test the generic publisher by running the following:
 
 ```bash
-user@host:~/communication$ sudo python3 -m communication.goose lo
+user@host:~/communication$ sudo python3 -m communication.publish_goose lo
 ```
 
 **NOTE**: The `lo` parameter represents the network interface which will send the GOOSE frame.  
