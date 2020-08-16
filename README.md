@@ -31,6 +31,27 @@ Should py61850 support raw MMS (ISO)?
 
 Should py61850 log what is happening? This might decrease performance.
 
+## NOTE
+
+You may convert an integer to encoded MAC address by using the `Ethernet.enet_itom()` function. Bear in mind that python supports instantiating hex values as integers, which makes it easier to convert MAC addresses, *e.g.*, `0x0123ABCD45EF`.
+
+You may also convert strings to encoded MAC address by using the `Ethernet.enet_stom()` function. It currently supports MAC addresses with no **splitter*, *e.g.*, `0123ABCD45EF`, or with one of the following *splitter*: colon `:`; hyphen `-`; or space ` `.
+
+```python
+>>> from communication.goose.ethernet import Ethernet
+>>> Ethernet.enet_itom(0)
+b'\x00\x00\x00\x00\x00\x00'
+
+>>> Ethernet.enet_itom(0x123456789abc)
+b'\x12\x34\x56\x78\x9a\xbc'
+
+>>> Ethernet.enet_stom('000000000000')
+b'\x00\x00\x00\x00\x00\x00'
+
+>>> Ethernet.enet_stom('FF-FF-FF-FF-FF-FF')
+b'\xFF\xFF\xFF\xFF\xFF\xFF'
+```
+
 ## GOOSE
 
 You can test the generic publisher by running the following:
