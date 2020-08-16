@@ -1,5 +1,5 @@
 from struct import pack as s_pack, unpack as s_unpack
-from iec.utils import U7, U8, U16
+from utils.numbers import U7, U8, U16
 
 
 class GenericIEC:

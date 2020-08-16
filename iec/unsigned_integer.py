@@ -1,6 +1,6 @@
 from struct import pack as s_pack, unpack as s_unpack
 from iec.generic_iec import GenericIEC
-from iec.utils import U8, U16, U32
+from utils.numbers import U8, U16, U32
 
 
 class UnsignedInt(GenericIEC):
