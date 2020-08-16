@@ -1,7 +1,7 @@
 import unittest
 from iec.floating_point import FloatingPoint
 from math import isnan
-from iec.utils import PI32, PI64, ONE_THIRD32, ONE_THIRD64
+from utils.numbers import PI32, PI64, ONE_THIRD32, ONE_THIRD64
 
 
 class TestFloatingPointSinglePrecisionPack(unittest.TestCase):

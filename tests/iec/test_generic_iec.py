@@ -1,6 +1,6 @@
 import unittest
 from iec.generic_iec import GenericIEC
-from iec.utils import U7, U8, U16
+from utils.numbers import U7, U8, U16
 
 
 class TestGenericIECGenPack(unittest.TestCase):

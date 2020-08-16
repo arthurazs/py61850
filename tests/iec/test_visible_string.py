@@ -1,6 +1,6 @@
 import unittest
 from iec.visible_string import VisibleString
-from iec.utils import U8
+from utils.numbers import U8
 
 
 class TestVisibleStringPack(unittest.TestCase):

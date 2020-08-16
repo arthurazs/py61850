@@ -1,6 +1,6 @@
 import unittest
 from iec.signed_integer import SignedInt
-from iec.utils import N8, P8, N16, P16, N32, P32, N64, P64
+from utils.numbers import N8, P8, N16, P16, N32, P32, N64, P64
 
 
 class TestIntegerPack(unittest.TestCase):
