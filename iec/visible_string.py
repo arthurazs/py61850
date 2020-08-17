@@ -6,16 +6,16 @@ class VisibleString(GenericIEC):
     TAG = b'\x8A'
 
     @staticmethod
-    def pack(data):
+    def pack(data, max_length=255):
+        # NOTE not sure if vstring is capped to 255
         if isinstance(data, (str, type(None), )):
             # NOTE should it be null terminated?
             try:
                 string = data.encode('utf8')
             except AttributeError:
                 return VisibleString.generic_pack(None)
-            # NOTE not sure if vstring is capped to 255
-            # if len(string) > 255:
-            #     raise ValueError('Visible string cannot be greater than 255 characters')
+            if len(string) > max_length:
+                raise ValueError(f'data cannot be greater than {max_length}')
             return VisibleString.generic_pack(string)
         raise ValueError('Cannot pack non-string value')
 

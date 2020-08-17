@@ -6,10 +6,10 @@ from utils.errors import raise_type
 class Ethernet:
 
     @staticmethod
-    def enet_itoe(integer):
+    def enet_itoe(integer, max_range=U16 - 1):
         # integer to ether type
         if isinstance(integer, int):
-            if 0 <= integer < U16:
+            if 0 <= integer <= max_range:
                 return s_pack('!H', integer)
             raise ValueError('integer out of supported range')
         raise_type('integer', int, type(integer))
