@@ -14,7 +14,7 @@ PRIORITIES = {  # is it useful?
 }
 
 
-class VirtualLan:
+class VirtualLAN:
     def __init__(self, ether_type=GOOSE_ETHER_TYPE, priority=4, vid=0):
         # NOTE add support for DPI == True?
         self._ether_type = ether_type

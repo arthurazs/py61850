@@ -1,5 +1,5 @@
 from unittest import TestCase
-from communication.goose.virtual_lan import VirtualLan
+from communication.goose.virtual_lan import VirtualLAN
 from utils.numbers import U12
 
 GOOSE_ETHER_TYPE = b'\x88\xb8'
@@ -10,14 +10,14 @@ DEFAULT_VID = 0
 
 class TestVLAN(TestCase):
     def setUp(self):
-        self.vlan = VirtualLan(ether_type=GOOSE_ETHER_TYPE, priority=DEFAULT_PRIO, vid=DEFAULT_VID)
+        self.vlan = VirtualLAN(ether_type=GOOSE_ETHER_TYPE, priority=DEFAULT_PRIO, vid=DEFAULT_VID)
 
     def test_init_min(self):
-        vlan = VirtualLan(ether_type=GOOSE_ETHER_TYPE, priority=0, vid=0)
+        vlan = VirtualLAN(ether_type=GOOSE_ETHER_TYPE, priority=0, vid=0)
         self.assertEqual(bytes(vlan), b'\x00\x00' + GOOSE_ETHER_TYPE)
 
     def test_init_max(self):
-        vlan = VirtualLan(ether_type=GOOSE_ETHER_TYPE, priority=7, vid=U12 - 1)
+        vlan = VirtualLAN(ether_type=GOOSE_ETHER_TYPE, priority=7, vid=U12 - 1)
         self.assertEqual(bytes(vlan), b'\xEF\xFF' + GOOSE_ETHER_TYPE)
 
     def test_prio_range_error(self):
