@@ -18,6 +18,8 @@ BER encoding.
 - [ ] Basic Types
   - [ ] Make sure data returns only the specified length, e.g.:
     - `data[1:5]` instead of `data[1:]` 
+  - [ ] Care for undefined [ASN.1 length](http://luca.ntop.org/Teaching/Appunti/asn1.html)
+    - `0x0000` to denote the end of the data 
   - [X] Boolean
   - [X] Unsigned Integer (ISO)
     - [ ] Enumerated (IEC)
@@ -36,7 +38,8 @@ Should py61850 log what is happening? This might decrease performance.
 
 ## Reference
 
-https://www.ossnokalva.com/asn1/resources/asn1-made-simple/introduction.html
+- https://www.sphinx-doc.org/en/1.8/usage/extensions/example_google.html#example-google
+- https://www.ossnokalva.com/asn1/resources/asn1-made-simple/introduction.html
 
 ## Ideas
 
