@@ -1,5 +1,5 @@
 import unittest
-from iec.visible_string import VisibleString
+from iec.types.visible_string import VisibleString
 from utils.numbers import U8
 
 

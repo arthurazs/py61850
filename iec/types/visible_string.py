@@ -1,7 +1,7 @@
-from iec.generic_iec import GenericIEC
+from iec.types.base import Base
 
 
-class VisibleString(GenericIEC):
+class VisibleString(Base):
 
     TAG = b'\x8A'
 

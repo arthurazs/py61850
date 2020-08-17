@@ -1,9 +1,9 @@
 from struct import pack as s_pack, unpack as s_unpack
-from iec.generic_iec import GenericIEC
+from iec.types.base import Base
 from utils.numbers import N8, P8, N16, P16, N32, P32, N64, P64
 
 
-class SignedInt(GenericIEC):
+class SignedInt(Base):
 
     TAG = b'\x85'
 

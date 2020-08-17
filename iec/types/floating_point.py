@@ -1,8 +1,8 @@
 from struct import pack as s_pack, unpack as s_unpack
-from iec.generic_iec import GenericIEC
+from iec.types.base import Base
 
 
-class FloatingPoint(GenericIEC):
+class FloatingPoint(Base):
 
     TAG = b'\x87'
 

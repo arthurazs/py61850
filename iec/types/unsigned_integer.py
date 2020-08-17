@@ -1,9 +1,9 @@
 from struct import pack as s_pack, unpack as s_unpack
-from iec.generic_iec import GenericIEC
+from iec.types.base import Base
 from utils.numbers import U8, U16, U32
 
 
-class UnsignedInt(GenericIEC):
+class UnsignedInt(Base):
 
     TAG = b'\x86'
 

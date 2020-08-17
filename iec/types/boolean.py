@@ -1,7 +1,7 @@
-from iec.generic_iec import GenericIEC
+from iec.types.base import Base
 
 
-class Boolean(GenericIEC):
+class Boolean(Base):
 
     TAG = b'\x83'
 

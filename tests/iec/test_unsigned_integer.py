@@ -1,5 +1,5 @@
 import unittest
-from iec.unsigned_integer import UnsignedInt
+from iec.types.unsigned_integer import UnsignedInt
 from utils.numbers import U8, U16, U32
 
 

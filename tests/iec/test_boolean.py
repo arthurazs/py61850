@@ -1,5 +1,5 @@
 import unittest
-from iec.boolean import Boolean
+from iec.types.boolean import Boolean
 
 
 class TestBooleanPack(unittest.TestCase):
