@@ -1,22 +1,35 @@
 from iec.types.base import Base
+from utils.errors import raise_type
+from typing import Union
 
 
 class Boolean(Base):
 
-    TAG = b'\x83'
+    def __init__(self, value: Union[bool, bytes]) -> None:
+        try:
+            raw_value = self._encode_value(value)
+        except TypeError:
+            raw_value = value
+            value = self._decode_value(value)
+        super().__init__(
+            raw_tag=b'\x83',
+            raw_value=raw_value)
+        self._value = value
 
     @staticmethod
-    def pack(data):
-        if isinstance(data, bool):
-            return Boolean.generic_pack(b'\x0F' if data else b'\x00')
-        raise ValueError('Cannot pack non-boolean value')
+    def _encode_value(value: bool) -> bytes:
+        if isinstance(value, bool):
+            return b'\x0F' if value else b'\x00'
+        raise_type('value', bool, type(value))
 
     @staticmethod
-    def unpack(data):
-        length, boolean = Boolean.generic_unpack(data)
+    def _decode_value(value: bytes) -> bool:
+        if isinstance(value, bytes):
+            if len(value) == 1:
+                return value != b'\x00'
+            raise ValueError('value out of supported length')
+        raise_type('value', bytes, type(value))
 
-        if length == 0:
-            return None
-        elif length == 1:
-            return False if boolean == b'\x00' else True
-        raise ValueError('Boolean out of supported range')
+    @property
+    def value(self) -> bool:
+        return self._value
