@@ -10,6 +10,7 @@ class VisibleString(Base):
         # NOTE not sure if vstring is capped to 255
         if isinstance(data, (str, type(None), )):
             # NOTE should it be null terminated?
+            # IEDs does not seem to have null terminated strings
             try:
                 string = data.encode('utf8')
             except AttributeError:
