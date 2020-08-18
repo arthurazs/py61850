@@ -8,6 +8,10 @@ According to IEC 61850 parts 7-2, 8-1 and 9-2, and ISO 9506 parts 1 and 2.
 
 BER encoding.
 
+- [ ] Imports order
+    - Standard library imports
+    - Third party imports
+    - Library imports
 - [ ] Exceptions
   - [ ] Add custom exceptions
     - [ ] TagError
@@ -36,6 +40,12 @@ Should py61850 support raw MMS (ISO)?
 
 Should py61850 log what is happening? This might decrease performance.
 
+Should support different modes of operation? (direct control, SBO, normal/enhanced sec)
+
+Change obj.tag to return the class name instead of the hex value of raw_tag?
+
+Should I enable changing obj value/raw_value after it being created?
+
 ## Reference
 
 - https://www.sphinx-doc.org/en/1.8/usage/extensions/example_google.html#example-google
@@ -51,6 +61,8 @@ Should py61850 log what is happening? This might decrease performance.
 - Communication Security
 - Teleprotection
 - Protection
+- IED Simm, simple, that sends a trip, and has gui (info tech ied sim)
+- Test bed with 3 substations? to study goose cascading, etc...
 
 ## NOTE
 
