@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 from struct import pack as s_pack
 from utils.errors import raise_type
 
@@ -7,7 +7,7 @@ class Base:
     """This is the base for any IEC data type.
 
     This class does not care for encoding, nor decoding the value field,
-    which should be handled by the subtype.
+    which should be handled by the subclass.
     Thus, the `Base` expects the already encoded value field, but handles
     the encoding/decoding of both tag and length field.
 
@@ -23,7 +23,7 @@ class Base:
 
     def __init__(self, raw_tag: bytes, raw_value: Optional[bytes] = None) -> None:
         self._set_tag(raw_tag)
-        self.raw_value = raw_value
+        self._set_raw_value(raw_value)
 
     def __bytes__(self) -> bytes:
         """Return the encoded data, including all existing fields.
@@ -50,12 +50,21 @@ class Base:
             return len(self.raw_tag) + len(self.raw_length)
         return len(self.raw_tag) + len(self.raw_length) + len(self.raw_value)
 
+    @staticmethod
+    def _encode_value(value: Any) -> bytes:
+        raise NotImplementedError  # pragma: no cover
+
+    @staticmethod
+    def _decode_value(value: bytes) -> Any:
+        raise NotImplementedError  # pragma: no cover
+
     def _set_tag(self, raw_tag: bytes) -> None:
-        # assert `raw_tag` is `bytes` and has length of 1, then set `raw_tag` and decode into `tag`
+        # assert `raw_tag` is `bytes` and has length of 1, then set `raw_tag` and `tag`
         if isinstance(raw_tag, bytes):
             if len(raw_tag) == 1:
                 self._raw_tag = raw_tag
-                self._tag = raw_tag.hex()
+                # self._tag = raw_tag.hex()
+                self._tag = self.__class__.__name__
             else:
                 raise ValueError('raw_tag out of supported length')
         else:
@@ -63,7 +72,7 @@ class Base:
 
     @property
     def tag(self) -> str:
-        """The decoded tag field."""
+        """The class name."""
         return self._tag
 
     @property
@@ -81,7 +90,6 @@ class Base:
         Example:
             128 == b'\x81\x80', where 0x81 indicates 1 extra byte
             for the length, and 0x80 is the length itself.
-
 
         Args:
             length: The length to be encoded.
@@ -103,21 +111,24 @@ class Base:
 
     @property
     def raw_value(self) -> Optional[bytes]:
-        """The encoded value field.
-
-        This property is settable.
-
-        Note:
-            This property does not encode the value field.
-            This should be done by the subtype.
-
-        Raises:
-            TypeError: If `raw_value` type is different from `bytes` and `NoneType`.
-        """
+        """The encoded value field."""
         return self._raw_value
 
-    @raw_value.setter
-    def raw_value(self, raw_value: Optional[bytes]) -> None:
+    def _set_raw_value(self, raw_value: Optional[bytes]) -> None:
+        """Set raw value field.
+
+        Note:
+            This method does not encode the value field.
+            This should be done by the subclass using
+            the `_encode_value()` method.
+
+        Args:
+            raw_value: The raw value to be set.
+
+        Raises:
+            ValueError: If the length of `raw_value` is greater than `0xFFFF`.
+            TypeError: If `raw_value` type is different from `bytes` and `NoneType`.
+        """
         if raw_value is None:
             self._raw_value = raw_value
             self._set_length(0)

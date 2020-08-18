@@ -19,7 +19,7 @@ def test_empty_value_raw_tag(empty_value):
 
 
 def test_empty_value_tag(empty_value):
-    assert empty_value.tag == '80'
+    assert empty_value.tag == 'Base'
 
 
 def test_empty_value_raw_value(empty_value):
@@ -49,7 +49,7 @@ def test_generic_raw_tag(generic):
 
 
 def test_generic_tag(generic):
-    assert generic.tag == '81'
+    assert generic.tag == 'Base'
 
 
 def test_generic_raw_value(generic):
