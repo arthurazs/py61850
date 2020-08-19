@@ -50,6 +50,7 @@ Should I enable changing obj value/raw_value after it being created?
 
 - https://www.sphinx-doc.org/en/1.8/usage/extensions/example_google.html#example-google
 - https://www.ossnokalva.com/asn1/resources/asn1-made-simple/introduction.html
+- IEC 61850-9-2 Figure A.3 (ASN.1)
 
 ## Ideas
 
