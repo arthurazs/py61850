@@ -1,19 +1,14 @@
+from typing import Union
+
 from iec.types.base import Base
 from utils.errors import raise_type
-from typing import Union
 
 
 class Boolean(Base):
 
     def __init__(self, value: Union[bool, bytes]) -> None:
-        try:
-            raw_value = self._encode_value(value)
-        except TypeError:
-            raw_value = value
-            value = self._decode_value(value)
-        super().__init__(
-            raw_tag=b'\x83',
-            raw_value=raw_value)
+        raw_value, value = self._parse_value(value)
+        super().__init__(raw_tag=b'\x83', raw_value=raw_value)
         self._value = value
 
     @staticmethod
@@ -29,7 +24,3 @@ class Boolean(Base):
                 return value != b'\x00'
             raise ValueError('value out of supported length')
         raise_type('value', bytes, type(value))
-
-    @property
-    def value(self) -> bool:
-        return self._value

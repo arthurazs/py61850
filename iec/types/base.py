@@ -1,5 +1,6 @@
-from typing import Optional, Any
+from typing import Any, Optional, Tuple
 from struct import pack as s_pack
+
 from utils.errors import raise_type
 
 
@@ -49,6 +50,16 @@ class Base:
         if self.raw_value is None:
             return len(self.raw_tag) + len(self.raw_length)
         return len(self.raw_tag) + len(self.raw_length) + len(self.raw_value)
+
+    def _parse_value(self, value: Any) -> Tuple[bytes, Any]:
+        try:
+            raw_value = self._encode_value(value)
+            if raw_value is None:
+                value = raw_value
+        except TypeError:
+            raw_value = value
+            value = self._decode_value(value)
+        return raw_value, value
 
     @staticmethod
     def _encode_value(value: Any) -> bytes:
@@ -152,3 +163,8 @@ class Base:
     def length(self):
         """The decoded length field"""
         return self._length
+
+    @property
+    def value(self) -> Any:
+        """The decoded value field"""
+        return self._value
