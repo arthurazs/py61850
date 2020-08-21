@@ -94,3 +94,8 @@ def test_decode_below():
 def test_decode_above():
     with raises(ValueError):
         Boolean(b'\x00\x00')
+
+
+def test_none():
+    with raises(TypeError):
+        Boolean(None)
