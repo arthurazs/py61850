@@ -1,5 +1,6 @@
 from pytest import fixture, raises
 from pytest import mark
+
 from iec.types.unsigned_integer import UnsignedInteger
 
 test_data = {
@@ -79,16 +80,6 @@ test_fields = {
         6,
     ],
 }
-
-
-@fixture
-def regular():
-    return UnsignedInteger(13)
-
-
-@fixture
-def extreme():
-    return UnsignedInteger(0x131313)
 
 
 # === ENCODE ===

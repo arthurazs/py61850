@@ -1,4 +1,5 @@
 from pytest import fixture, raises
+
 from iec.types.base import Base
 
 
