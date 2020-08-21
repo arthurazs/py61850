@@ -55,10 +55,10 @@ class Base:
         try:
             raw_value = self._encode_value(value)
             if raw_value is None:
-                value = raw_value
+                value = None
         except TypeError:
             raw_value = value
-            value = self._decode_value(value)
+            value = self._decode_value(raw_value)
         return raw_value, value
 
     @staticmethod
