@@ -1,4 +1,4 @@
-from pytest import fixture, raises
+from pytest import raises
 from pytest import mark
 
 from iec.types.signed_integer import SignedInteger
@@ -6,24 +6,16 @@ from iec.types.signed_integer import SignedInteger
 test_data = {
     id: ['1_min', '1_max', '2_min', '2_max', '4_min', '4_max', '8_min', '8_max'],
     int: [
-        -0x80,                                  # 1_min
-        0x7F,                                   # 1_max
-        -0x8000,                                # 2_min
-        0x7FFF,                                 # 2_max
-        -0x80000000,                            # 4_min
-        0x7FFFFFFF,                             # 4_max
-        -0x80 ** 0x9,                           # 8_min
-        (0x80 ** 0x9) - 1,                      # 8_max
+        -0x80, 0x7F,                                                                # 1 min/max
+        -0x8000, 0x7FFF,                                                            # 2 min/max
+        -0x80000000, 0x7FFFFFFF,                                                    # 4 min/max
+        -0x80 ** 0x9, (0x80 ** 0x9) - 1,                                            # 8 min/max
     ],
     bytes: [
-        b'\x80',                                # 1_min
-        b'\x7F',                                # 1_max
-        b'\x80\x00',                            # 2_min
-        b'\x7F\xFF',                            # 2_max
-        b'\x80\x00\x00\x00',                    # 4_min
-        b'\x7F\xFF\xFF\xFF',                    # 4_max
-        b'\x80\x00\x00\x00\x00\x00\x00\x00',    # 8_min
-        b'\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF',    # 8_max
+        b'\x80', b'\x7F',                                                           # 1 min/max
+        b'\x80\x00', b'\x7F\xFF',                                                   # 2 min/max
+        b'\x80\x00\x00\x00', b'\x7F\xFF\xFF\xFF',                                   # 4 min/max
+        b'\x80\x00\x00\x00\x00\x00\x00\x00', b'\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF',   # 8 min/max
     ],
 }
 

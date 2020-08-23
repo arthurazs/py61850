@@ -1,4 +1,4 @@
-from pytest import fixture, raises
+from pytest import raises
 from pytest import mark
 
 from iec.types.unsigned_integer import UnsignedInteger
