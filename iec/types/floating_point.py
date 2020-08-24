@@ -5,57 +5,47 @@ from iec.types.base import Base
 from utils.errors import raise_type
 
 
-class SinglePrecision(Base):
-    def __init__(self, value: Union[float, bytes]) -> None:
+class FloatingPoint(Base):
+    def __init__(self, value: Union[float, bytes], double_precision: bool) -> None:
+        if double_precision:
+            self._exponent = b'\x11'
+            self._format = '!d'
+            self._length = 9
+            self._name = 'DoublePrecision'
+        else:
+            self._exponent = b'\x08'
+            self._format = '!f'
+            self._length = 5
+            self._name = 'SinglePrecision'
         raw_value, value = self._parse_value(value)
         super().__init__(raw_tag=b'\x87', raw_value=raw_value)
         self._value = value
 
-    @staticmethod
-    def _encode_value(value: float) -> bytes:
+    def _encode_value(self, value: float) -> bytes:
         if isinstance(value, float):
-            return b'\x08' + s_pack('!f', value)
+            return self._exponent + s_pack(self._format, value)
         raise_type('value', float, type(value))
 
-    @staticmethod
-    def _decode_value(value: bytes) -> float:
+    def _decode_value(self, value: bytes) -> float:
         if isinstance(value, bytes):
-            if len(value) == 5:
-                if value[0:1] == b'\x08':
-                    return s_unpack('!f', value[1:5])[0]
-                raise ValueError("Single precision floating point's exponent out of supported range")
-            raise ValueError('Single precision floating point out of supported length')
+            if len(value) == self._length:
+                if value[0:1] == self._exponent:
+                    return s_unpack(self._format, value[1:self._length])[0]
+                raise ValueError(f"{self._name} floating point's exponent out of supported range")
+            raise ValueError(f'{self._name} floating point out of supported length')
         raise_type('value', bytes, type(value))
 
     @property
     def tag(self) -> str:
         """The class name."""
-        return 'SinglePrecisionFloatingPoint'
+        return self.__class__.__name__ + 'FloatingPoint'
 
 
-class DoublePrecision(Base):
+class SinglePrecision(FloatingPoint):
     def __init__(self, value: Union[float, bytes]) -> None:
-        raw_value, value = self._parse_value(value)
-        super().__init__(raw_tag=b'\x87', raw_value=raw_value)
-        self._value = value
+        super().__init__(value, double_precision=False)
 
-    @staticmethod
-    def _encode_value(value: float) -> bytes:
-        if isinstance(value, float):
-            return b'\x11' + s_pack('!d', value)
-        raise_type('value', float, type(value))
 
-    @staticmethod
-    def _decode_value(value: bytes) -> float:
-        if isinstance(value, bytes):
-            if len(value) == 9:
-                if value[0:1] == b'\x11':
-                    return s_unpack('!d', value[1:9])[0]
-                raise ValueError("Single precision floating point's exponent out of supported range")
-            raise ValueError('Single precision floating point out of supported length')
-        raise_type('value', bytes, type(value))
-
-    @property
-    def tag(self) -> str:
-        """The class name."""
-        return 'DoublePrecisionFloatingPoint'
+class DoublePrecision(FloatingPoint):
+    def __init__(self, value: Union[float, bytes]) -> None:
+        super().__init__(value, double_precision=True)
