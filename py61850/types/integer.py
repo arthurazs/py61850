@@ -1,8 +1,8 @@
 from struct import pack as s_pack, unpack as s_unpack
 from typing import Union
 
-from iec.types.base import Base
-from utils.errors import raise_type
+from py61850.types.base import Base
+from py61850.utils.errors import raise_type
 
 
 class Unsigned(Base):

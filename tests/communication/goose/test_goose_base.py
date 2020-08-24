@@ -1,6 +1,6 @@
 import unittest
-from communication.goose.ethernet import Ethernet
-from utils.numbers import U16, U48, U64
+from py61850.communication.goose.ethernet import Ethernet
+from py61850.utils.numbers import U16, U48, U64
 
 
 class TestEthernetPackMAC(unittest.TestCase):

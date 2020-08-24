@@ -1,7 +1,7 @@
 from typing import Any, Optional, Tuple
 from struct import pack as s_pack
 
-from utils.errors import raise_type
+from py61850.utils.errors import raise_type
 
 
 class Base:

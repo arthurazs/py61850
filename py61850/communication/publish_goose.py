@@ -1,9 +1,9 @@
 from socket import socket, AF_PACKET, SOCK_RAW
 from sys import argv
 from struct import pack
-from iec.types.visible_string import VisibleString
-from iec.types.boolean import Boolean
-from iec.types.signed_integer import SignedInt
+from py61850.types import VisibleString
+from py61850.types.boolean import Boolean
+from py61850.types.integer import Signed
 
 
 def pack_data(tag, data):
@@ -35,7 +35,7 @@ test_bit = b'\x87\x01\x00'
 conf_rev = b'\x88\x01' + pack('>B', 1)
 nds_com = b'\x89\x01\x00'
 
-entries = [VisibleString.pack('Arthur'), Boolean.pack(True), SignedInt.pack(13)]
+entries = [VisibleString.pack('Arthur'), Boolean.pack(True), Signed.pack(13)]
 dat_set_entries = b'\x8a\x01' + pack('>B', len(entries))
 booleans = b''.join(entries)
 all_data = b'\xab' + pack('>B', len(booleans)) + booleans

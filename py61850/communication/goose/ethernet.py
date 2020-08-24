@@ -1,6 +1,6 @@
 from struct import pack as s_pack, Struct
-from utils.numbers import U16, U48
-from utils.errors import raise_type
+from py61850.utils.numbers import U16, U48
+from py61850.utils.errors import raise_type
 
 
 class Ethernet:

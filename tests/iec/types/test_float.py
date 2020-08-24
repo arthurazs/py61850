@@ -1,8 +1,7 @@
 from pytest import fixture, raises
 from pytest import mark
 
-from iec.types.floating_point import SinglePrecision
-from iec.types.floating_point import DoublePrecision
+from py61850.types.floating_point import SinglePrecision, DoublePrecision
 from math import isnan
 
 test_data_single = {

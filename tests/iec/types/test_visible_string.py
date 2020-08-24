@@ -1,6 +1,6 @@
 from pytest import fixture, raises
 
-from iec.types import VisibleString
+from py61850.types import VisibleString
 
 
 @fixture

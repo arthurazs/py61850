@@ -1,7 +1,7 @@
 from typing import Optional, Union
 
-from iec.types.base import Base
-from utils.errors import raise_type
+from py61850.types.base import Base
+from py61850.utils.errors import raise_type
 
 
 class VisibleString(Base):

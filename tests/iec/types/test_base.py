@@ -1,6 +1,6 @@
 from pytest import fixture, raises
 
-from iec.types.base import Base
+from py61850.types.base import Base
 
 
 @fixture

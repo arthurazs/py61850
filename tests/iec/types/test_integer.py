@@ -1,7 +1,7 @@
 from pytest import raises
 from pytest import mark
 
-from iec.types.integer import Signed, Unsigned
+from py61850.types.integer import Signed, Unsigned
 
 
 class TestSigned:

@@ -1,5 +1,5 @@
 from struct import pack as s_pack
-from utils.numbers import U12
+from py61850.utils.numbers import U12
 
 GOOSE_ETHER_TYPE = b'\x88\xb8'
 PRIORITIES = {  # is it useful?
