@@ -1,12 +1,12 @@
 from struct import pack as s_pack, Struct
-from py61850.utils.numbers import U16, U48
+from py61850.utils.numbers import U48
 from py61850.utils.errors import raise_type
 
 
 class Ethernet:
 
     @staticmethod
-    def enet_itoe(integer, max_range=U16 - 1):
+    def enet_itoe(integer, max_range=0xFFFF):
         # integer to ether type
         if isinstance(integer, int):
             if 0 <= integer <= max_range:

@@ -1,5 +1,5 @@
 import unittest
-from py61850.communication.goose.ethernet import Ethernet
+from py61850.goose.ethernet import Ethernet
 from py61850.utils.numbers import U16, U48, U64
 
 

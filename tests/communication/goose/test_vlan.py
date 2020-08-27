@@ -1,5 +1,5 @@
 from unittest import TestCase
-from py61850.communication.goose.virtual_lan import VirtualLAN
+from py61850.goose.virtual_lan import VirtualLAN
 from py61850.utils.numbers import U12
 
 GOOSE_ETHER_TYPE = b'\x88\xb8'
