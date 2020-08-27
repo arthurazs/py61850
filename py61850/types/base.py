@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, Union
 from struct import pack as s_pack
 
 from py61850.utils.errors import raise_type
@@ -85,6 +85,17 @@ class Base(Generic, ABC):
                 raise ValueError('raw_tag out of supported length')
         else:
             raise_type('raw_tag', bytes, type(raw_tag))
+
+    @staticmethod
+    def unpack_extra_value(
+            value_a: Union[bytes, Tuple[bytes, Any]], value_b: Union[bool, Tuple[Any, Any]]) -> Tuple[bytes, Any, Any]:
+        try:
+            value_a, value_c = value_a
+        except ValueError:
+            value_b, value_c = value_b
+        if value_c is None:
+            value_b, value_c = value_b
+        return value_a, value_b, value_c
 
     @property
     def tag(self) -> str:
