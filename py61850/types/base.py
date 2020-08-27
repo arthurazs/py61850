@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Tuple
 from struct import pack as s_pack
 
 from py61850.utils.errors import raise_type
