@@ -32,7 +32,7 @@ BER encoding.
   - [X] Visible String
   - [ ] Octet String
   - [ ] MMS String (ISO) | Unicode String (IEC)
-  - [ ] Time Stamp
+  - [X] Time Stamp
   - [ ] Time of Day (ISO) | Entry Time (IEC)  
   - [ ] Bit String (ISO) | Coded Enum (IEC)
 
