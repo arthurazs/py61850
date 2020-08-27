@@ -1,10 +1,33 @@
-from typing import Any, Optional, Tuple
+from abc import ABC
+from typing import Any, Optional, Tuple, Union
 from struct import pack as s_pack
 
 from py61850.utils.errors import raise_type
 
 
-class Base:
+class Generic(ABC):
+
+    def _parse(self, anything: Any) -> Tuple[bytes, Any]:
+        try:
+            value = anything
+            raw_value = self._encode(value)
+            if raw_value is None:
+                value = None
+        except TypeError:
+            raw_value = anything
+            value = self._decode(raw_value)
+        return raw_value, value
+
+    @staticmethod
+    def _encode(value: Any) -> bytes:
+        raise NotImplementedError  # pragma: no cover
+
+    @staticmethod
+    def _decode(raw_value: bytes) -> Any:
+        raise NotImplementedError  # pragma: no cover
+
+
+class Base(Generic, ABC):
     """This is the base for any IEC data type.
 
     This class does not care for encoding, nor decoding the value field,
@@ -50,24 +73,6 @@ class Base:
         if self.raw_value is None:
             return len(self.raw_tag) + len(self.raw_length)
         return len(self.raw_tag) + len(self.raw_length) + len(self.raw_value)
-
-    def _parse_value(self, value: Any) -> Tuple[bytes, Any]:
-        try:
-            raw_value = self._encode_value(value)
-            if raw_value is None:
-                value = None
-        except TypeError:
-            raw_value = value
-            value = self._decode_value(raw_value)
-        return raw_value, value
-
-    @staticmethod
-    def _encode_value(value: Any) -> bytes:
-        raise NotImplementedError  # pragma: no cover
-
-    @staticmethod
-    def _decode_value(value: bytes) -> Any:
-        raise NotImplementedError  # pragma: no cover
 
     def _set_tag(self, raw_tag: bytes) -> None:
         # assert `raw_tag` is `bytes` and has length of 1, then set `raw_tag` and `tag`

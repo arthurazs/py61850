@@ -6,27 +6,26 @@ from py61850.utils.errors import raise_type
 
 class VisibleString(Base):
 
-    def __init__(self, value: Union[str, bytes]) -> None:
-        raw_value, value = self._parse_value(value)
-        super().__init__(raw_tag=b'\x8A', raw_value=raw_value)
+    def __init__(self, anything: Union[str, bytes], max_length: int = 0xFF, raw_tag: bytes = b'\x8A') -> None:
+        self._max_length = max_length
+        raw_value, value = self._parse(anything)
+        super().__init__(raw_tag=raw_tag, raw_value=raw_value)
         self._value = value
 
-    @staticmethod
-    def _encode_value(value: Optional[str]) -> Optional[bytes]:
+    def _encode(self, value: Optional[str]) -> Optional[bytes]:
         if value is None:
             return None
         elif isinstance(value, str):
             if len(value) == 0:
                 return None
-            elif 0 < len(value) <= 0xFF:
+            elif 0 < len(value) <= self._max_length:
                 # TODO How should I limit other string lengths?
                 return value.encode('utf8')
         raise_type('value', str, type(value))
 
-    @staticmethod
-    def _decode_value(value: bytes) -> Optional[str]:
-        if isinstance(value, bytes):
-            if 0 < len(value) <= 0xFF:
-                return value.decode('utf8')
-            raise ValueError('value out of supported length')
-        raise_type('value', bytes, type(value))
+    def _decode(self, raw_value: bytes) -> Optional[str]:
+        if isinstance(raw_value, bytes):
+            if 0 < len(raw_value) <= self._max_length:
+                return raw_value.decode('utf8')
+            raise ValueError('raw_value out of supported length')
+        raise_type('raw_value', bytes, type(raw_value))
