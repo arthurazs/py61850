@@ -31,7 +31,7 @@ class Quality(Generic):
         bits = s_unpack('!B', raw_value)[0]
 
         time_accuracy = bits & 0x1F
-        if time_accuracy > 24:
+        if time_accuracy > 24 and time_accuracy != 0x1F:
             raise ValueError('bits out of supported range')
 
         leap_seconds_known = (bits & 0x80) == 0x80
@@ -51,7 +51,7 @@ class Quality(Generic):
         if not isinstance(time_accuracy, int):
             raise_type('time_accuracy', int, type(time_accuracy))
 
-        if 0 <= time_accuracy <= 24:
+        if 0 <= time_accuracy <= 24 or time_accuracy == 0x1F:
             self._accuracy = time_accuracy
         else:
             raise ValueError('time_accuracy out of supported range')
@@ -73,22 +73,18 @@ class Quality(Generic):
         return self._clock_not_sync
 
     @property
-    def time_accuracy(self):
-        return self._accuracy
+    def time_accuracy(self) -> Union[int, str]:
+        # TODO Test this
+        return 'Unspecified' if self._accuracy == 0x1F else self._accuracy
 
 
 class Timestamp(Base):
 
     # UTC Time
-    def __init__(self, anything: Union[float, bytes], quality: Optional[Quality] = None):
+    def __init__(self, anything: Union[float, bytes], quality: Optional[Quality] = None, raw_tag: bytes = b'\x91'):
         raw_value, value = self._parse((anything, quality))
-        try:
-            raw_value, quality = raw_value
-        except ValueError:
-            value, quality = value
-        if quality is None:
-            value, quality = value
-        super().__init__(raw_tag=b'\x91', raw_value=raw_value)
+        raw_value, value, quality = self.unpack_extra_value(raw_value, value)
+        super().__init__(raw_tag=raw_tag, raw_value=raw_value)
         self._value = value
         self._quality = quality
 
@@ -113,6 +109,7 @@ class Timestamp(Base):
         if len(raw_value) != 8:
             raise ValueError('raw_value out of supported length')
         seconds = s_unpack('!I', raw_value[:4])[0]
+        # TODO Fraction seems to be wrong
         fraction = s_unpack('!I', b'\x00' + raw_value[4:7])[0]
         quality = Quality(byte=raw_value[7:8])
         return float(str(f'{seconds}.{fraction}')), quality
