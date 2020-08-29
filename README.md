@@ -8,10 +8,6 @@ According to IEC 61850 parts 7-2, 8-1 and 9-2, and ISO 9506 parts 1 and 2.
 
 BER encoding.
 
-- [ ] Imports order
-    - Standard library imports
-    - Third party imports
-    - Library imports
 - [ ] Exceptions
   - [ ] Add custom exceptions
     - [ ] TagError
@@ -45,6 +41,8 @@ Should support different modes of operation? (direct control, SBO, normal/enhanc
 Change obj.tag to return the class name instead of the hex value of raw_tag?
 
 Should I enable changing obj value/raw_value after it being created?
+
+Check [gridsoftware](http://www.gridsoftware.com).
 
 ## Reference
 
