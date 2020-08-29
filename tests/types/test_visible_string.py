@@ -144,6 +144,11 @@ def test_encode_decode():
         VisibleString(1)
 
 
+def test_encode_above():
+    with raises(ValueError):
+        VisibleString('a' * 0x1FF)
+
+
 def test_decode_below():
     with raises(ValueError):
         VisibleString(b'')

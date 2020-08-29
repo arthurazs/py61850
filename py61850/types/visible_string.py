@@ -21,6 +21,7 @@ class VisibleString(Base):
             elif 0 < len(value) <= self._max_length:
                 # TODO How should I limit other string lengths?
                 return value.encode('utf8')
+            raise ValueError('value out of supported length')
         raise_type('value', str, type(value))
 
     def _decode(self, raw_value: bytes) -> Optional[str]:
