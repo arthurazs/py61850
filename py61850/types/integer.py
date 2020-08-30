@@ -16,37 +16,35 @@ class Unsigned(Base):
         self._value = value
 
     def _encode(self, value: int) -> bytes:
-        if isinstance(value, int):
-            if value < 0:
-                raise ValueError('Unsigned integer cannot be negative')
-            elif value <= 0xFF and self._min_range <= value <= self._max_range:
-                return s_pack('!B', value)
-            elif value <= 0xFFFF and self._min_range <= value <= self._max_range:
-                return s_pack('!H', value)
-            # elif value <= 0xFFFFFF and self._min_range <= value <= self._max_range:
-            #     # NOTE regular MMS does not have 24 bits unsigned int
-            #     # NOTE 24 bits unsigned int seems to be used only for timestamp
-            #     return s_pack('!I', value)[1:]
-            elif value <= 0xFFFFFFFF and self._min_range <= value <= self._max_range:
-                return s_pack('!I', value)
-            raise ValueError('Unsigned integer out of supported range')
-        raise_type('value', int, type(value))
+        if not isinstance(value, int):
+            raise_type('value', int, type(value))
+        if value < 0:
+            raise ValueError('Unsigned integer cannot be negative')
+        elif value <= 0xFF and self._min_range <= value <= self._max_range:
+            return s_pack('!B', value)
+        elif value <= 0xFFFF and self._min_range <= value <= self._max_range:
+            return s_pack('!H', value)
+        # elif value <= 0xFFFFFF and self._min_range <= value <= self._max_range:
+        #     # NOTE regular MMS does not have 24 bits unsigned int
+        #     # NOTE 24 bits unsigned int seems to be used only for timestamp
+        #     return s_pack('!I', value)[1:]
+        elif value <= 0xFFFFFFFF and self._min_range <= value <= self._max_range:
+            return s_pack('!I', value)
+        raise ValueError('Unsigned integer out of supported range')
 
     @staticmethod
     def _decode(raw_value: bytes) -> int:
-        if isinstance(raw_value, bytes):
-            if len(raw_value) == 1:
-                return s_unpack('!B', raw_value)[0]
-            elif len(raw_value) == 2:
-                return s_unpack('!H', raw_value)[0]
-            # elif len(raw_value) == 3:
-            #     # NOTE regular MMS does not have 24 bits unsigned int
-            #     # NOTE 24 bits unsigned int seems to be used only for timestamp
-            #     return s_unpack('!I', b'\x00' + raw_value)[0]
-            elif len(raw_value) == 4:
-                return s_unpack('!I', raw_value)[0]
-            raise ValueError('Unsigned integer out of supported range')
-        raise_type('raw_value', bytes, type(raw_value))
+        if len(raw_value) == 1:
+            return s_unpack('!B', raw_value)[0]
+        elif len(raw_value) == 2:
+            return s_unpack('!H', raw_value)[0]
+        # elif len(raw_value) == 3:
+        #     # NOTE regular MMS does not have 24 bits unsigned int
+        #     # NOTE 24 bits unsigned int seems to be used only for timestamp
+        #     return s_unpack('!I', b'\x00' + raw_value)[0]
+        elif len(raw_value) == 4:
+            return s_unpack('!I', raw_value)[0]
+        raise ValueError('Unsigned integer out of supported range')
 
     @property
     def tag(self) -> str:
@@ -62,31 +60,29 @@ class Signed(Base):
 
     @staticmethod
     def _encode(value: int) -> bytes:
-        if isinstance(value, int):
-            if -0x80 <= value < 0x80:
-                return s_pack('!b', value)
-            elif -0x8000 <= value < 0x8000:
-                return s_pack('!h', value)
-            elif -0x80000000 <= value < 0x80000000:
-                return s_pack('!i', value)
-            elif -0x80 ** 0x9 <= value < 0x80 ** 0x9:  # NOTE change support from 64 to 128?
-                return s_pack('!q', value)
-            raise ValueError('Signed integer out of supported range')
-        raise_type('value', int, type(value))
+        if not isinstance(value, int):
+            raise_type('value', int, type(value))
+        if -0x80 <= value < 0x80:
+            return s_pack('!b', value)
+        elif -0x8000 <= value < 0x8000:
+            return s_pack('!h', value)
+        elif -0x80000000 <= value < 0x80000000:
+            return s_pack('!i', value)
+        elif -0x80 ** 0x9 <= value < 0x80 ** 0x9:  # NOTE change support from 64 to 128?
+            return s_pack('!q', value)
+        raise ValueError('Signed integer out of supported range')
 
     @staticmethod
     def _decode(raw_value: bytes) -> int:
-        if isinstance(raw_value, bytes):
-            if len(raw_value) == 1:
-                return s_unpack('!b', raw_value)[0]
-            elif len(raw_value) == 2:
-                return s_unpack('!h', raw_value)[0]
-            elif len(raw_value) == 4:
-                return s_unpack('!i', raw_value)[0]
-            elif len(raw_value) == 8:
-                return s_unpack('!q', raw_value)[0]
-            raise ValueError('Signed integer out of supported range')
-        raise_type('raw_value', bytes, type(raw_value))
+        if len(raw_value) == 1:
+            return s_unpack('!b', raw_value)[0]
+        elif len(raw_value) == 2:
+            return s_unpack('!h', raw_value)[0]
+        elif len(raw_value) == 4:
+            return s_unpack('!i', raw_value)[0]
+        elif len(raw_value) == 8:
+            return s_unpack('!q', raw_value)[0]
+        raise ValueError('Signed integer out of supported range')
 
     @property
     def tag(self) -> str:

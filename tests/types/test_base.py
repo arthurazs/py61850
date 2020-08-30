@@ -150,3 +150,19 @@ def test_set_raw_value_type_error():
 def test_set_length_value_error():
     with raises(ValueError):
         Base(b'\x85', b'a' * 0x1FFFF)
+
+
+# === EXTRA VALUE ===
+def test_a_c_b():
+    a, b, c = Base.unpack_extra_value((b'1', 3), 2)
+    assert a == b'1' and b == 2 and c == 3
+
+
+def test_a_b_c():
+    a, b, c = Base.unpack_extra_value(b'1', (2, 3))
+    assert a == b'1' and b == 2 and c == 3
+
+
+def test_a_none_b_c():
+    a, b, c = Base.unpack_extra_value((b'1', None), (2, 3))
+    assert a == b'1' and b == 2 and c == 3

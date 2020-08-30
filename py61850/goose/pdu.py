@@ -3,7 +3,7 @@ from typing import NoReturn, Optional, Tuple
 from py61850.types import Boolean, VisibleString
 from py61850.types.base import Base
 from py61850.types.integer import Unsigned
-from py61850.types.times import Timestamp, Quality
+from py61850.types.times import Quality, Timestamp
 from py61850.utils.errors import raise_type
 
 
@@ -103,8 +103,8 @@ class AllData(Base):
 
     @staticmethod
     def _encode(value: Tuple[Base, ...]) -> Tuple[bytes, int]:
-        if not isinstance(value, tuple):
-            raise_type('value', tuple, type(value))
+        # TODO Improve
+        # if value is None: return None, 0
 
         all_data = b''
         for base in value:
@@ -185,7 +185,8 @@ class ProtocolDataUnit(Base):
 
     @staticmethod
     def _decode(raw_value: bytes) -> NoReturn:
-        raise RuntimeError
+        # TODO Implement
+        raise NotImplementedError
 
     @property
     def goose_control_block_reference(self):

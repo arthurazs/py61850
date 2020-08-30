@@ -149,11 +149,23 @@ def test_encode_above():
         VisibleString('a' * 0x1FF)
 
 
-def test_decode_below():
-    with raises(ValueError):
-        VisibleString(b'')
-
-
 def test_decode_above():
     with raises(ValueError):
         VisibleString(b'a' * 0x1FF)
+
+
+# === NONES ===
+def test_none_empty():
+    assert VisibleString().value is None
+
+
+def test_none_string():
+    assert VisibleString('').value is None
+
+
+def test_none_byte():
+    assert VisibleString(b'').value is None
+
+
+def test_none_none():
+    assert VisibleString(None).value is None

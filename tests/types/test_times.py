@@ -30,32 +30,32 @@ class TestQuality:
 
     @mark.parametrize("attr, byte", zip(test_data['attr'], test_data[bytes]), ids=test_data[id])
     def test_decode_leap(self, attr, byte):
-        assert Quality(byte=byte).leap_seconds_known == attr[0]
+        assert Quality(raw_value=byte).leap_seconds_known == attr[0]
 
     @mark.parametrize("attr, byte", zip(test_data['attr'], test_data[bytes]), ids=test_data[id])
     def test_decode_fail(self, attr, byte):
-        assert Quality(byte=byte).clock_failure == attr[1]
+        assert Quality(raw_value=byte).clock_failure == attr[1]
 
     @mark.parametrize("attr, byte", zip(test_data['attr'], test_data[bytes]), ids=test_data[id])
     def test_decode_sync(self, attr, byte):
-        assert Quality(byte=byte).clock_not_synchronized == attr[2]
+        assert Quality(raw_value=byte).clock_not_synchronized == attr[2]
 
     @mark.parametrize("attr, byte", zip(test_data['attr'], test_data[bytes]), ids=test_data[id])
     def test_decode_accuracy(self, attr, byte):
-        assert Quality(byte=byte).time_accuracy == attr[3]
+        assert Quality(raw_value=byte).time_accuracy == attr[3]
 
     # === EXCEPTIONS ===
     def test_decode_not_byte(self):
-        assert raises(TypeError, Quality, byte='1')
+        assert raises(TypeError, Quality, raw_value='1')
 
     def test_decode_length(self):
-        assert raises(ValueError, Quality, byte=b'')
+        assert raises(ValueError, Quality, raw_value=b'')
 
     def test_decode_accuracy_range(self):
-        assert raises(ValueError, Quality, byte=b'\x19')
+        assert raises(ValueError, Quality, raw_value=b'\x19')
 
     def test_encode_accuracy_range(self):
-        assert raises(ValueError, Quality, byte=b'\x19')
+        assert raises(ValueError, Quality, raw_value=b'\x19')
 
     @mark.parametrize("attr, error", zip(test_error['attr'], test_error['error']), ids=test_error[id])
     def test_decode_attr(self, attr, error):
@@ -68,7 +68,9 @@ class TestTimestamp:
     test_data = {
         id: ['min', 'extreme', 'generic'],
         'attr': [
-            (0.0, Quality(byte=b'\x00')), (1598487698.4095, Quality(byte=b'\xF8')), (1598487698.0, Quality())],
+            (0.0, Quality(raw_value=b'\x00')),
+            (1598487698.4095, Quality(raw_value=b'\xF8')),
+            (1598487698.0, Quality())],
         bytes: [
             b'\x00\x00\x00\x00\x00\x00\x00\x00',
             b'\x5F\x46\xFC\x92\x00\x0F\xFF\xF8',
@@ -101,6 +103,9 @@ class TestTimestamp:
         assert Timestamp(byte).time_accuracy == attr[1].time_accuracy
 
     # === EXCEPTIONS ===
+    def test_encode_type(self):
+        assert raises(TypeError, Timestamp, 123)
+
     def test_encode_missing_quality(self):
         assert raises(TypeError, Timestamp, 123.123)
 

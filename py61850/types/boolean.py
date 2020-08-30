@@ -13,14 +13,12 @@ class Boolean(Base):
 
     @staticmethod
     def _encode(value: bool) -> bytes:
-        if isinstance(value, bool):
-            return b'\x0F' if value else b'\x00'
-        raise_type('value', bool, type(value))
+        if not isinstance(value, bool):
+            raise_type('value', bool, type(value))
+        return b'\x0F' if value else b'\x00'
 
     @staticmethod
     def _decode(raw_value: bytes) -> bool:
-        if isinstance(raw_value, bytes):
-            if len(raw_value) == 1:
-                return raw_value != b'\x00'
+        if len(raw_value) != 1:
             raise ValueError('value out of supported length')
-        raise_type('raw_value', bytes, type(raw_value))
+        return raw_value != b'\x00'

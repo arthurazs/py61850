@@ -117,3 +117,47 @@ class TestProtocolDataUnit:
     def test_correct_num_of_entries():
         pdu = ProtocolDataUnit(number_of_data_set_entries=NumberOfDataSetEntries(1), all_data=AllData(Boolean(True)))
         assert pdu.number_of_data_set_entries.value == pdu.all_data.number_of_data_set_entries
+
+    @staticmethod
+    def test_error_0():
+        assert raises(TypeError, ProtocolDataUnit, control_block_reference=1)
+
+    @staticmethod
+    def test_error_1():
+        assert raises(TypeError, ProtocolDataUnit, time_allowed_to_live=1)
+
+    @staticmethod
+    def test_error_2():
+        assert raises(TypeError, ProtocolDataUnit, data_set=1)
+
+    @staticmethod
+    def test_error_3():
+        assert raises(TypeError, ProtocolDataUnit, goose_identifier=1)
+
+    @staticmethod
+    def test_error_4():
+        assert raises(TypeError, ProtocolDataUnit, goose_timestamp=1)
+
+    @staticmethod
+    def test_error_5():
+        assert raises(TypeError, ProtocolDataUnit, status_number=1)
+
+    @staticmethod
+    def test_error_6():
+        assert raises(TypeError, ProtocolDataUnit, sequence_number=1)
+
+    @staticmethod
+    def test_error_7():
+        assert raises(TypeError, ProtocolDataUnit, test=1)
+
+    @staticmethod
+    def test_error_8():
+        assert raises(TypeError, ProtocolDataUnit, configuration_revision=1)
+
+    @staticmethod
+    def test_error_9():
+        assert raises(TypeError, ProtocolDataUnit, needs_commissioning=1)
+
+    @staticmethod
+    def test_error_10():
+        assert raises(TypeError, ProtocolDataUnit, number_of_data_set_entries=1)

@@ -40,7 +40,7 @@ class TestGooseTest:
 class TestGooseTimestamp:
     @fixture
     def regular_date(self):
-        return GooseTimestamp(1.1, Quality(byte=b'\x00'))
+        return GooseTimestamp(1.1, Quality(raw_value=b'\x00'))
 
     @staticmethod
     def test_bytes(regular_date):
@@ -298,3 +298,7 @@ class TestAllData:
     @staticmethod
     def test_tag():
         assert AllData(Boolean(False)).tag == 'AllData'
+
+    @staticmethod
+    def test_error_type():
+        assert raises(TypeError, AllData, 1)

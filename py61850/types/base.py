@@ -7,15 +7,23 @@ from py61850.utils.errors import raise_type
 
 class Generic(ABC):
 
-    def _parse(self, anything: Any) -> Tuple[bytes, Any]:
-        try:
-            value = anything
-            raw_value = self._encode(value)
-            if raw_value is None:
-                value = None
-        except TypeError:
+    def _parse(self, anything: Any) -> Tuple[Optional[bytes], Any]:
+
+        unpacked = anything
+        if not isinstance(anything, bytes):
+            try:
+                unpacked = anything[0]
+            except (TypeError, IndexError):
+                pass
+
+        if isinstance(unpacked, bytes):
             raw_value = anything
             value = self._decode(raw_value)
+        else:
+            value = anything
+            raw_value = self._encode(value)
+        if raw_value is None or value is None:
+            return None, None
         return raw_value, value
 
     @staticmethod
@@ -76,19 +84,17 @@ class Base(Generic, ABC):
 
     def _set_tag(self, raw_tag: bytes) -> None:
         # assert `raw_tag` is `bytes` and has length of 1, then set `raw_tag` and `tag`
-        if isinstance(raw_tag, bytes):
-            if len(raw_tag) == 1:
-                self._raw_tag = raw_tag
-                # self._tag = raw_tag.hex()
-                self._tag = self.__class__.__name__
-            else:
-                raise ValueError('raw_tag out of supported length')
-        else:
+        if not isinstance(raw_tag, bytes):
             raise_type('raw_tag', bytes, type(raw_tag))
+        if len(raw_tag) != 1:
+            raise ValueError('raw_tag out of supported length')
+        self._raw_tag = raw_tag
+        # self._tag = raw_tag.hex()
+        self._tag = self.__class__.__name__
 
     @staticmethod
-    def unpack_extra_value(
-            value_a: Union[bytes, Tuple[bytes, Any]], value_b: Union[bool, Tuple[Any, Any]]) -> Tuple[bytes, Any, Any]:
+    def unpack_extra_value(value_a: Union[bytes, Tuple[bytes, Any]],
+                           value_b: Union[Any, Tuple[Any, Any]]) -> Tuple[bytes, Any, Any]:
         try:
             value_a, value_c = value_a
         except ValueError:
@@ -160,11 +166,10 @@ class Base(Generic, ABC):
             self._raw_value = raw_value
             self._set_length(0)
         else:
-            if isinstance(raw_value, bytes):
-                self._raw_value = raw_value
-                self._set_length(len(raw_value))
-            else:
+            if not isinstance(raw_value, bytes):
                 raise_type('raw_value', bytes, type(raw_value))
+            self._raw_value = raw_value
+            self._set_length(len(raw_value))
 
     @property
     def raw_length(self):

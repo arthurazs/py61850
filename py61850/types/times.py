@@ -7,20 +7,19 @@ from py61850.utils.errors import raise_type
 
 class Quality(Generic):
     def __init__(self, leap_seconds_known: bool = False, clock_failure: bool = False,
-                 clock_not_synchronized: bool = True, time_accuracy: int = 0,
-                 byte: Optional[bytes] = None):
-        if byte is not None:
-            leap_seconds_known, clock_failure, clock_not_synchronized, time_accuracy = self._decode(byte)
+                 clock_not_synchronized: bool = True, time_accuracy: int = 0, raw_value: Optional[bytes] = None):
+        if raw_value is None:
+            raw_value = self._encode((leap_seconds_known, clock_failure, clock_not_synchronized, time_accuracy))
         else:
-            byte = self._encode((leap_seconds_known, clock_failure, clock_not_synchronized, time_accuracy))
-        self._byte = byte
+            leap_seconds_known, clock_failure, clock_not_synchronized, time_accuracy = self._decode(raw_value)
+        self._raw_value = raw_value
         self._leap_seconds = leap_seconds_known
         self._clock_failure = clock_failure
         self._clock_not_sync = clock_not_synchronized
         self._accuracy = time_accuracy
 
     def __bytes__(self):
-        return self._byte
+        return self._raw_value
 
     def _decode(self, raw_value: bytes) -> Tuple[bool, bool, bool, int]:
         if not isinstance(raw_value, bytes):
@@ -104,14 +103,12 @@ class Timestamp(Base):
     @staticmethod
     def _decode(raw_value: bytes) -> Tuple[float, Quality]:
         raw_value, _ = raw_value
-        if not isinstance(raw_value, bytes):
-            raise_type('raw_value', bytes, type(raw_value))
         if len(raw_value) != 8:
             raise ValueError('raw_value out of supported length')
         seconds = s_unpack('!I', raw_value[:4])[0]
         # TODO Fraction seems to be wrong
         fraction = s_unpack('!I', b'\x00' + raw_value[4:7])[0]
-        quality = Quality(byte=raw_value[7:8])
+        quality = Quality(raw_value=raw_value[7:8])
         return float(str(f'{seconds}.{fraction}')), quality
 
     @property

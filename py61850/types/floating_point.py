@@ -22,18 +22,16 @@ class FloatingPoint(Base):
         self._value = value
 
     def _encode(self, value: float) -> bytes:
-        if isinstance(value, float):
-            return self._exponent + s_pack(self._format, value)
-        raise_type('value', float, type(value))
+        if not isinstance(value, float):
+            raise_type('value', float, type(value))
+        return self._exponent + s_pack(self._format, value)
 
     def _decode(self, raw_value: bytes) -> float:
-        if isinstance(raw_value, bytes):
-            if len(raw_value) == self._length:
-                if raw_value[0:1] == self._exponent:
-                    return s_unpack(self._format, raw_value[1:self._length])[0]
-                raise ValueError(f"{self._name} floating point's exponent out of supported range")
+        if len(raw_value) != self._length:
             raise ValueError(f'{self._name} floating point out of supported length')
-        raise_type('raw_value', bytes, type(raw_value))
+        if raw_value[0:1] != self._exponent:
+            raise ValueError(f"{self._name} floating point's exponent out of supported range")
+        return s_unpack(self._format, raw_value[1:self._length])[0]
 
     @property
     def tag(self) -> str:

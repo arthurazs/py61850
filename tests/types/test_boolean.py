@@ -100,3 +100,8 @@ def test_decode_above():
 def test_none():
     with raises(TypeError):
         Boolean(None)
+
+
+def test_none_empty():
+    with raises(TypeError):
+        Boolean()
