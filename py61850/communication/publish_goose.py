@@ -1,56 +1,62 @@
-from socket import socket, AF_PACKET, SOCK_RAW
+from socket import AF_PACKET, socket, SOCK_RAW
 from sys import argv
-from struct import pack
-from py61850.types import VisibleString
-from py61850.types.boolean import Boolean
-from py61850.types.integer import Signed
+from time import time, time_ns
 
+from py61850.goose.publisher import Publisher
+from py61850.types import Boolean, VisibleString
+from py61850.types.floating_point import DoublePrecision, SinglePrecision
+from py61850.types.integer import Signed, Unsigned
+from py61850.types.times import Quality, Timestamp
 
-def pack_data(tag, data):
-    return tag + pack('>B', len(data)) + data
+nic = socket(AF_PACKET, SOCK_RAW)
+nic.bind((argv[1], 0))
 
+now = time_ns()
 
-goose = socket(AF_PACKET, SOCK_RAW)
-goose.bind((argv[1], 0))
+data = {
+    # HEADER
+    'destination': b'\x01\x0c\xcd\x01\x00\x13',
+    'source': b'\x7c\x8a\xe1\xd9\xcf\xbe',
+    # VLAN
+    'virtual_lan': True,
+    'vlan_priority': 7,
+    'vlan_id': 0xFFF,
+    # GOOSE
+    'app_id': 13,
+    # PDU
+    'goose_control_block_reference': 'ASD_CFG/LLN0$GO$GOOSE_SENDER',
+    'time_allowed_to_live': 1000,
+    'data_set': 'ASD_CFG/LLN0$MyDataSet',
+    'goose_identifier': 'ASD',
+    'goose_timestamp': time(),
+    'status_number': 1,
+    'sequence_number': 0,
+    'test': True,
+    'configuration_revision': 13,
+    'needs_commissioning': True,
+    # ALL DATA
+    'all_data': (
+        Boolean(True),
+        VisibleString('Content'),
+        DoublePrecision(1.2),
+        SinglePrecision(3.4),
+        Signed(-5),
+        Unsigned(6),
+        Timestamp(
+            705762855.123456789,
+            Quality(False, False, True, 13)
+        )
+    )
+}
 
-destination = b'\x01\x0c\xcd\x01\x00\x03'
-source = b'\x2c\x4d\x54\x4b\x0d\x56'
-ether_type = b'\x81\x00'  # vLAN
+publisher = Publisher(**data)
 
-v_lan = b'\x80\x03\x88\xb8'
+goose = bytes(publisher)
+nic.send(goose)
 
-time_atl = b'\x81\x02' + pack('>H', 1000)
+for index, goose in enumerate(publisher):
+    nic.send(bytes(goose))
+    if index == 0xF:
+        break
 
-go_cb_ref = pack_data(b'\x80', b'GE_GOOSECFG/LLN0$GO$TapsTransformador')
-dat_set = pack_data(b'\x82', b'GE_GOOSECFG/LLN0$TapsTransformador')
-go_id = pack_data(b'\x83', b'GE_GOOSE')
-
-time_stamp = pack_data(
-    tag=b'\x84',
-    data=b'\x5f\x0f\x5c\xd7\xf4\xf7\x65\xbf'
-)
-st_num = b'\x85\x01' + pack('>B', 1)
-sq_num = b'\x86\x01' + pack('>B', 1)
-test_bit = b'\x87\x01\x00'
-conf_rev = b'\x88\x01' + pack('>B', 1)
-nds_com = b'\x89\x01\x00'
-
-entries = [VisibleString.pack('Arthur'), Boolean.pack(True), Signed.pack(13)]
-dat_set_entries = b'\x8a\x01' + pack('>B', len(entries))
-booleans = b''.join(entries)
-all_data = b'\xab' + pack('>B', len(booleans)) + booleans
-
-reserved = b'\x00\x00\x00\x00'
-pdu = go_cb_ref + time_atl + dat_set + go_id + time_stamp + st_num + sq_num + \
-      test_bit + conf_rev + nds_com + dat_set_entries + all_data
-
-# assert len(pdu) < 128
-pdu_info = b'\x61\x81' + pack('>B', len(pdu)) + pdu
-goose_frame = reserved + pdu_info
-
-app_id = b'\x00\x03'
-goose_frame = app_id + pack('>H', len(goose_frame) + 4) + goose_frame
-goose.send(
-    destination + source + ether_type +
-    v_lan + goose_frame
-)
+print(f'{(time_ns() - now) / 1000}us')
