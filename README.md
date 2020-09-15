@@ -44,6 +44,8 @@ Should I enable changing obj value/raw_value after it being created?
 
 Check [gridsoftware](http://www.gridsoftware.com).
 
+Frame Generator or GOOSE Emulator? *e.g.*, Should I enable starting a GOOSE from stnum 10 instead of 0?
+
 ## Reference
 
 - https://www.sphinx-doc.org/en/1.8/usage/extensions/example_google.html#example-google
