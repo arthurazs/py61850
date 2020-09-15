@@ -147,7 +147,3 @@ class TestEthernetUnpackEtherType(unittest.TestCase):
 
     def test_etos(self):
         self.assertEqual(Ethernet.enet_etos(b'\x12\xab'), '12AB')
-
-
-if __name__ == '__main__':
-    unittest.main()
