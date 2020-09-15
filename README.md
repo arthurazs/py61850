@@ -1,10 +1,10 @@
 # py61850
 
 Stable Version, Linting (PEP8) and Coverage
-[![Health Status](https://github.com/arthurazs/py61850/workflows/Health (Py3.8)/badge.svg](https://github.com/arthurazs/py61850/actions?query=workflow%3A"Health+(Py3.8)")
+[![Health Status](https://github.com/arthurazs/py61850/workflows/Health%20%28Py3.8%29/badge.svg](https://github.com/arthurazs/py61850/actions?query=workflow%3A"Health+(Py3.8)")
 
 Testing for other Python Versions 
-[![Health Status](https://github.com/arthurazs/py61850/workflows/Version (Py3.6, Py3.7)/badge.svg](https://github.com/arthurazs/py61850/actions?query=workflow%3A"Version+(Py3.6,+Py3.7)")
+[![Health Status](https://github.com/arthurazs/py61850/workflows/Version%20%28Py3.6%2C%20Py3.7%29/badge.svg](https://github.com/arthurazs/py61850/actions?query=workflow%3A"Version+(Py3.6,+Py3.7)")
 IEC 61850 in Python 3.
 
 ## What I want it to be
