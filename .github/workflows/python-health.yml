@@ -1,4 +1,4 @@
-name: Python health
+name: Health (Py3.8)
 
 on: [push, pull_request]
 

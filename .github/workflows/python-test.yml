@@ -1,4 +1,4 @@
-name: Python test
+name: Version (Py3.6, Py3.7)
 
 on: [push, pull_request]
 

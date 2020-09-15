@@ -1,12 +1,53 @@
 # py61850
 
+Stable Version, Linting (PEP8) and Coverage
+[![Health Status](https://github.com/arthurazs/py61850/workflows/Health (Py3.8)/badge.svg](https://github.com/arthurazs/py61850/actions?query=workflow%3A"Health+(Py3.8)")
+
+Testing for other Python Versions 
+[![Health Status](https://github.com/arthurazs/py61850/workflows/Version (Py3.6, Py3.7)/badge.svg](https://github.com/arthurazs/py61850/actions?query=workflow%3A"Version+(Py3.6,+Py3.7)")
 IEC 61850 in Python 3.
+
+## What I want it to be
+
+### sync61850
+
+```python
+from socket import AF_PACKET, socket, SOCK_RAW
+from sys import argv
+from time import sleep
+
+nic = socket(AF_PACKET, SOCK_RAW)
+nic.bind((argv[1], 0))
+
+from sansio61850.goose import Publisher
+from sansio61850.types import Boolean, VisibleString
+from sansio61850.types.integer import Signed, Unsigned
+
+
+ied = 'IED_Pub'
+ref = f'{ied}_CFG/LLN0'
+data = (Boolean(True), VisibleString('Content'), Signed(-5), Unsigned(6))
+publisher = Publisher(destination='01:0c:cd:01:00:13', vlan=False, app_id=1,
+                      gcb_ref=f'{ref}$GO$GOOSE_SENDER', data_set=f'{ref}$MyDataSet',
+                      go_id=ied, all_data=data)
+
+for st_num, goose in enumerate(publisher):
+    if st_num == 10:
+        goose.pdu.all_data[1] = 'New Content'  # VisibleString
+    nic.send(bytes(goose))
+    sleep(goose.next_goose_timer)
+```
 
 ## Roadmap
 
 According to IEC 61850 parts 7-2, 8-1 and 9-2, and ISO 9506 parts 1 and 2. 
 
 BER encoding.
+
+- NEXT TODOs
+ - add base.py missing test
+ - move py61850 to sansio61850, sync61850
+ - separate encoder from decoder
 
 - [ ] Exceptions
   - [ ] Add custom exceptions
