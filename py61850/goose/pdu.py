@@ -42,6 +42,24 @@ class GooseTimestamp(Timestamp):
 class StatusNumber(Unsigned):
     def __init__(self, integer: int):
         super().__init__(integer, min_range=1, max_range=0xFFFFFFFF, raw_tag=b'\x85')
+        self._iter = False
+
+    def __iter__(self):
+        # TODO Return a different object? #asd
+        # next(obj) should not affect the original object
+        self._iter = True
+        return self
+
+    def __next__(self):
+        try:
+            if self._iter:
+                self.value += 1
+                return self
+            else:
+                raise TypeError(f"'{self.__class__.__name__}' object is not iterable")
+        except ValueError:
+            self._iter = False
+            raise StopIteration
 
     @property
     def tag(self) -> str:
@@ -51,8 +69,22 @@ class StatusNumber(Unsigned):
 
 class SequenceNumber(Unsigned):
     def __init__(self, integer: int):
-        # TODO start at 0 but rollover to 1!!!
         super().__init__(integer, min_range=0, max_range=0xFFFFFFFF, raw_tag=b'\x86')
+
+    def __iter__(self):
+        self._first = True
+        return self
+
+    def __next__(self):
+        try:
+            if self._first is False:
+                self.value += 1
+            self._first = False
+            return self
+        except ValueError:
+            raise StopIteration
+        except AttributeError:
+            raise TypeError(f"'{self.__class__.__name__}' object is not iterable")
 
     @property
     def tag(self) -> str:
@@ -100,6 +132,11 @@ class AllData(Base):
         self._value = value
         super().__init__(raw_tag=b'\xAB', raw_value=raw_value)
         self._number_of_entries = number_of_entries
+        try:
+            for value in self._value:
+                value.set_parent(self)
+        except TypeError:
+            pass
 
     @staticmethod
     def _encode(value: Tuple[Base, ...]) -> Tuple[bytes, int]:
@@ -108,6 +145,9 @@ class AllData(Base):
 
         all_data = b''
         for base in value:
+            # TODO validate against standard types instead of Base?
+            # like, test if v_str, u_int, s_int, f_32, f_64, etc
+            # like, raise error for g_t_smp, sq_num, etc
             if not isinstance(base, Base):
                 raise_type('base', Base, type(base))
             all_data += bytes(base)
@@ -122,6 +162,9 @@ class AllData(Base):
     def number_of_data_set_entries(self):
         return self._number_of_entries
 
+    def __getitem__(self, item):
+        return self._value[item]
+
 
 class ProtocolDataUnit(Base):
     _DATA_TYPES = [('control_block_reference', GooseControlBlockReference), ('time_allowed_to_live', TimeAllowedToLive),
@@ -132,21 +175,68 @@ class ProtocolDataUnit(Base):
 
     # Table 56 (61850-8-1)
     def __init__(self,
-                 control_block_reference: GooseControlBlockReference = GooseControlBlockReference(
-                     'IED_CFG/LLN0$GO$ControlBlockReference'),
-                 time_allowed_to_live: TimeAllowedToLive = TimeAllowedToLive(1000),
-                 data_set: DataSet = DataSet('IED_CFG/LLN0$DataSet'),
-                 goose_identifier: GooseIdentifier = GooseIdentifier('IED'),
-                 goose_timestamp: GooseTimestamp = GooseTimestamp(0.0), status_number: StatusNumber = StatusNumber(1),
-                 sequence_number: SequenceNumber = SequenceNumber(0), test: GooseTest = GooseTest(False),
-                 configuration_revision: ConfigurationRevision = ConfigurationRevision(1),
-                 needs_commissioning: NeedsCommissioning = NeedsCommissioning(False),
-                 number_of_data_set_entries: Optional[NumberOfDataSetEntries] = None, all_data: AllData = AllData()):
-        raw_value, value = self._parse((control_block_reference, time_allowed_to_live, data_set, goose_identifier,
-                                       goose_timestamp, status_number, sequence_number, test, configuration_revision,
-                                       needs_commissioning, number_of_data_set_entries, all_data))
+                 control_block_reference: GooseControlBlockReference, time_allowed_to_live: TimeAllowedToLive,
+                 data_set: DataSet, goose_identifier: GooseIdentifier, goose_timestamp: GooseTimestamp,
+                 status_number: StatusNumber, sequence_number: SequenceNumber, test: GooseTest,
+                 configuration_revision: ConfigurationRevision, needs_commissioning: NeedsCommissioning,
+                 # TODO remove numOfDatSet from here, remove default value for AllData
+                 number_of_data_set_entries: Optional[NumberOfDataSetEntries] = None, all_data: AllData = AllData(),
+                 raw_value: bytes = None):
+        if raw_value:
+            raise NotImplementedError
+        else:
+            raw_value, number_of_data_set_entries = self._encode((control_block_reference, time_allowed_to_live,
+                                                                  data_set, goose_identifier, goose_timestamp,
+                                                                  status_number, sequence_number, test,
+                                                                  configuration_revision, needs_commissioning,
+                                                                  number_of_data_set_entries, all_data))
         super().__init__(raw_tag=b'\x61', raw_value=raw_value)
-        self._value = value
+        self._value = (control_block_reference, time_allowed_to_live, data_set, goose_identifier, goose_timestamp,
+                       status_number, sequence_number, test, configuration_revision, needs_commissioning,
+                       number_of_data_set_entries, all_data)
+        for value in self._value:
+            value.set_parent(self)
+
+    def __iter__(self):
+        self._iter = True
+        self._iter_status = iter(self.status_number)
+        self._iter_sequence = iter(self.sequence_number)
+        return self
+
+    def __next__(self):
+        try:
+            # update time allowed to live + time stamp
+            self._iter
+            next(self._iter_sequence)
+        except StopIteration:
+            self.sequence_number.value = 1
+            self._iter_sequence = iter(self.sequence_number)
+            next(self._iter_sequence)
+        except AttributeError:
+            raise TypeError(f"'{self.__class__.__name__}' object is not iterable")
+        self._generic_update()
+        return self
+
+    def _generic_update(self):
+        byte_stream = b''
+        for value in self._value:
+            byte_stream += bytes(value)
+        self._set_raw_value(byte_stream)
+
+    def _update(self, caller: Base):
+        if isinstance(caller, AllData):
+            # TODO what if i change a value for the same value? Should update trigger?
+            try:
+                # TODO only change if next was already called
+                # e.g. pdu.all_data[0] = 1; pdu.all_data[1] = 'Okay' \
+                # should generate only ONE new status change, not 2
+                self._iter
+                next(self._iter_status)
+                self.sequence_number.value = 0
+                self._iter_sequence = iter(self.sequence_number)
+            except AttributeError:
+                pass
+            self._generic_update()
 
     @staticmethod
     def _assert_type(data):
@@ -161,7 +251,7 @@ class ProtocolDataUnit(Base):
     @staticmethod
     def _encode(value: Tuple[GooseControlBlockReference, TimeAllowedToLive, DataSet, GooseIdentifier, GooseTimestamp,
                              StatusNumber, SequenceNumber, GooseTest, ConfigurationRevision, NeedsCommissioning,
-                             NumberOfDataSetEntries, AllData]) -> bytes:
+                             NumberOfDataSetEntries, AllData]) -> Tuple[bytes, NumberOfDataSetEntries]:
 
         ProtocolDataUnit._assert_type(value)
 
@@ -181,7 +271,7 @@ class ProtocolDataUnit(Base):
             bytes(control_block_reference) + bytes(time_allowed_to_live) + bytes(data_set) + \
             bytes(goose_identifier) + bytes(goose_timestamp) + bytes(status_number) + bytes(sequence_number) + \
             bytes(test) + bytes(configuration_revision) + bytes(needs_commissioning) + \
-            bytes(number_of_data_set_entries) + bytes(all_data)
+            bytes(number_of_data_set_entries) + bytes(all_data), number_of_data_set_entries
 
     @staticmethod
     def _decode(raw_value: bytes) -> NoReturn:

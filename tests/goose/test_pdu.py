@@ -7,9 +7,6 @@ from py61850.types import Boolean
 
 
 class TestProtocolDataUnit:
-    @fixture
-    def pdu(self):
-        return ProtocolDataUnit()
 
     @fixture
     def cb_ref(self):
@@ -50,6 +47,22 @@ class TestProtocolDataUnit:
     @fixture
     def nds_com(self):
         return NeedsCommissioning(False)
+
+    @fixture
+    def num_entries(self):
+        return NumberOfDataSetEntries(1)
+
+    @fixture
+    def all_data(self):
+        return AllData(Boolean(True))
+
+    @fixture
+    def pdu(self, cb_ref, ttl, dat_set, go_id, t, st_num, sq_num, go_test, conf_rev, nds_com):
+        return ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num, go_test, conf_rev, nds_com)
+
+    @fixture
+    def iter_pdu(self, pdu):
+        return iter(pdu)
 
     @staticmethod
     def test_bytes(pdu):
@@ -108,56 +121,206 @@ class TestProtocolDataUnit:
         assert bytes(pdu.needs_commissioning) == bytes(nds_com)
 
     @staticmethod
-    def test_wrong_num_of_entries():
-        assert raises(ValueError, ProtocolDataUnit,
-                      number_of_data_set_entries=NumberOfDataSetEntries(2),
-                      all_data=AllData(Boolean(True)))
+    def test_wrong_num_of_entries(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                  go_test, conf_rev, nds_com, all_data):
+        with raises(ValueError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num, go_test,
+                             conf_rev, nds_com, NumberOfDataSetEntries(2), all_data)
 
     @staticmethod
-    def test_correct_num_of_entries():
-        pdu = ProtocolDataUnit(number_of_data_set_entries=NumberOfDataSetEntries(1), all_data=AllData(Boolean(True)))
+    def test_correct_num_of_entries(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                    go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
         assert pdu.number_of_data_set_entries.value == pdu.all_data.number_of_data_set_entries
 
     @staticmethod
-    def test_error_0():
-        assert raises(TypeError, ProtocolDataUnit, control_block_reference=1)
+    def test_error_cb_ref(ttl, dat_set, go_id, t, st_num, sq_num, go_test, conf_rev, nds_com, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(1, dat_set, go_id, t, st_num, sq_num,
+                             go_test, conf_rev, nds_com, num_entries, all_data)
 
     @staticmethod
-    def test_error_1():
-        assert raises(TypeError, ProtocolDataUnit, time_allowed_to_live=1)
+    def test_error_ttl(cb_ref, dat_set, go_id, t, st_num, sq_num, go_test, conf_rev, nds_com, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, 1, dat_set, go_id, t, st_num, sq_num,
+                             go_test, conf_rev, nds_com, num_entries, all_data)
 
     @staticmethod
-    def test_error_2():
-        assert raises(TypeError, ProtocolDataUnit, data_set=1)
+    def test_error_dat_set(cb_ref, ttl, go_id, t, st_num, sq_num, go_test, conf_rev, nds_com, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, 1, go_id, t, st_num, sq_num,
+                             go_test, conf_rev, nds_com, num_entries, all_data)
 
     @staticmethod
-    def test_error_3():
-        assert raises(TypeError, ProtocolDataUnit, goose_identifier=1)
+    def test_error_go_id(cb_ref, ttl, dat_set, t, st_num, sq_num, go_test, conf_rev, nds_com, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, 1, t, st_num, sq_num,
+                             go_test, conf_rev, nds_com, num_entries, all_data)
 
     @staticmethod
-    def test_error_4():
-        assert raises(TypeError, ProtocolDataUnit, goose_timestamp=1)
+    def test_error_t(cb_ref, ttl, dat_set, go_id, st_num, sq_num, go_test, conf_rev, nds_com, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, 1, st_num, sq_num,
+                             go_test, conf_rev, nds_com, num_entries, all_data)
 
     @staticmethod
-    def test_error_5():
-        assert raises(TypeError, ProtocolDataUnit, status_number=1)
+    def test_error_st_num(cb_ref, ttl, dat_set, go_id, t, sq_num, go_test, conf_rev, nds_com, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, 1, sq_num,
+                             go_test, conf_rev, nds_com, num_entries, all_data)
 
     @staticmethod
-    def test_error_6():
-        assert raises(TypeError, ProtocolDataUnit, sequence_number=1)
+    def test_error_sq_num(cb_ref, ttl, dat_set, go_id, t, st_num, go_test, conf_rev, nds_com, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, 1,
+                             go_test, conf_rev, nds_com, num_entries, all_data)
 
     @staticmethod
-    def test_error_7():
-        assert raises(TypeError, ProtocolDataUnit, test=1)
+    def test_error_go_test(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num, conf_rev, nds_com, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                             1, conf_rev, nds_com, num_entries, all_data)
 
     @staticmethod
-    def test_error_8():
-        assert raises(TypeError, ProtocolDataUnit, configuration_revision=1)
+    def test_error_conf_rev(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num, go_test, nds_com, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                             go_test, 1, nds_com, num_entries, all_data)
 
     @staticmethod
-    def test_error_9():
-        assert raises(TypeError, ProtocolDataUnit, needs_commissioning=1)
+    def test_error_nds_com(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num, go_test, conf_rev, num_entries, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                             go_test, conf_rev, 1, num_entries, all_data)
 
     @staticmethod
-    def test_error_10():
-        assert raises(TypeError, ProtocolDataUnit, number_of_data_set_entries=1)
+    def test_error_num_entries(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num, go_test, conf_rev, nds_com, all_data):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                             go_test, conf_rev, nds_com, 1, all_data)
+
+    @staticmethod
+    def test_error_all_data(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num, go_test, conf_rev, nds_com, num_entries):
+        with raises(TypeError):
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                             go_test, conf_rev, nds_com, num_entries, 1)
+
+    @staticmethod
+    def test_no_iter(pdu):
+        with raises(TypeError) as info:
+            next(pdu)
+        assert str(info.value) == "'ProtocolDataUnit' object is not iterable"
+
+    @staticmethod
+    def test_iter_first_st(iter_pdu):
+        assert next(iter_pdu).status_number.value == 1
+
+    @staticmethod
+    def test_iter_first_sq(iter_pdu):
+        assert next(iter_pdu).sequence_number.value == 0
+
+    @staticmethod
+    def test_iter_second_st(iter_pdu):
+        next(iter_pdu)
+        assert next(iter_pdu).status_number.value == 1
+
+    @staticmethod
+    def test_iter_second_sq(iter_pdu):
+        next(iter_pdu)
+        assert next(iter_pdu).sequence_number.value == 1
+
+    @staticmethod
+    def test_iter_last_st(pdu):
+        pdu.sequence_number.value = 0xFFFFFFFF
+        iter_pdu = iter(pdu)
+        next(iter_pdu)
+        assert next(iter_pdu).status_number.value == 1
+
+    @staticmethod
+    def test_iter_last_sq(pdu):
+        pdu.sequence_number.value = 0xFFFFFFFF
+        iter_pdu = iter(pdu)
+        next(iter_pdu)
+        assert next(iter_pdu).sequence_number.value == 1
+
+    @staticmethod
+    def test_all_data_change_no_iter_st(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                        go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
+        pdu.all_data[0].value = False
+        assert pdu.status_number.value == 1
+
+    @staticmethod
+    def test_all_data_change_no_iter_sq(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                        go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
+        pdu.all_data[0].value = False
+        assert pdu.sequence_number.value == 0
+
+    @staticmethod
+    def test_all_data_change_iter_st(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                     go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
+        iter_pdu = iter(pdu)
+        iter_pdu.all_data[0].value = False
+        assert pdu.status_number.value == 2
+
+    @staticmethod
+    def test_all_data_change_iter_sq(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                     go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
+        iter_pdu = iter(pdu)
+        iter_pdu.all_data[0].value = False
+        assert pdu.sequence_number.value == 0
+
+    @staticmethod
+    def test_all_data_change_no_iter_error(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                           go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
+        with raises(TypeError) as info:
+            next(pdu)
+        assert str(info.value) == "'ProtocolDataUnit' object is not iterable"
+
+    @staticmethod
+    def test_all_data_change_next_st(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                     go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
+        iter_pdu = iter(pdu)
+        iter_pdu.all_data[0].value = False
+        assert next(pdu).status_number.value == 2
+
+    @staticmethod
+    def test_all_data_change_next_sq(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                     go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
+        iter_pdu = iter(pdu)
+        iter_pdu.all_data[0].value = False
+        assert next(pdu).sequence_number.value == 0
+
+    @staticmethod
+    def test_all_data_change_next_2_st(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                       go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
+        iter_pdu = iter(pdu)
+        iter_pdu.all_data[0].value = False
+        next(iter_pdu)
+        assert next(pdu).status_number.value == 2
+
+    @staticmethod
+    def test_all_data_change_next_2_sq(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                                       go_test, conf_rev, nds_com, num_entries, all_data):
+        pdu = ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num,
+                               go_test, conf_rev, nds_com, num_entries, all_data)
+        iter_pdu = iter(pdu)
+        iter_pdu.all_data[0].value = False
+        next(iter_pdu)
+        assert next(pdu).sequence_number.value == 1

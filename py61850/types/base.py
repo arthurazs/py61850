@@ -56,6 +56,7 @@ class Base(Generic, ABC):
     def __init__(self, raw_tag: bytes, raw_value: Optional[bytes] = None) -> None:
         self._set_tag(raw_tag)
         self._set_raw_value(raw_value)
+        self._parent = None
 
     def __bytes__(self) -> bytes:
         """Return the encoded data, including all existing fields.
@@ -64,9 +65,9 @@ class Base(Generic, ABC):
 
         If value field is not `None`: return tag + length + value.
         """
-        if self.raw_value is None:
-            return self.raw_tag + self.raw_length
-        return self.raw_tag + self.raw_length + self.raw_value
+        if self._raw_value is None:
+            return self._raw_tag + self._raw_length
+        return self._raw_tag + self._raw_length + self._raw_value
 
     def __len__(self) -> int:
         """Return the length of the encoded data, including all existing fields.
@@ -81,6 +82,17 @@ class Base(Generic, ABC):
         if self.raw_value is None:
             return len(self.raw_tag) + len(self.raw_length)
         return len(self.raw_tag) + len(self.raw_length) + len(self.raw_value)
+
+    def set_parent(self, parent: 'Base'):
+        if not isinstance(parent, Base):
+            raise_type('parent', Base, type(parent))
+        self._parent = parent
+
+    def _update(self, caller: 'Base'):
+        byte_stream = b''
+        for value in self._value:
+            byte_stream += bytes(value)
+        self._set_raw_value(byte_stream)
 
     def _set_tag(self, raw_tag: bytes) -> None:
         # assert `raw_tag` is `bytes` and has length of 1, then set `raw_tag` and `tag`
@@ -171,6 +183,11 @@ class Base(Generic, ABC):
             self._raw_value = raw_value
             self._set_length(len(raw_value))
 
+        try:
+            self._parent._update(self)
+        except AttributeError:
+            pass
+
     @property
     def raw_length(self):
         """The encoded length field.
@@ -189,3 +206,9 @@ class Base(Generic, ABC):
     def value(self) -> Any:
         """The decoded value field"""
         return self._value
+
+    @value.setter
+    def value(self, value: Any) -> None:
+        raw_value = self._encode(value)
+        self._set_raw_value(raw_value)
+        self._value = value

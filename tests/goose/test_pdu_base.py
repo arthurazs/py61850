@@ -109,6 +109,10 @@ class TestSequenceNumber:
     def zero(self):
         return SequenceNumber(0)
 
+    @fixture
+    def iter_sq(self):
+        return iter(SequenceNumber(0))
+
     @staticmethod
     def test_min_bytes(zero):
         assert bytes(zero) == b'\x86\x01\x00'
@@ -119,21 +123,50 @@ class TestSequenceNumber:
 
     @staticmethod
     def test_bellow():
-        assert raises(ValueError, SequenceNumber, -1)
+        with raises(ValueError) as info:
+            SequenceNumber(-1)
+        assert str(info.value) == 'Unsigned integer cannot be negative'
 
     @staticmethod
     def test_above():
-        assert raises(ValueError, SequenceNumber, 0x1FFFFFFFF)
+        with raises(ValueError) as info:
+            SequenceNumber(0x1FFFFFFFF)
+        assert str(info.value) == 'Unsigned integer out of supported range'
 
     @staticmethod
     def test_tag(zero):
         assert zero.tag == 'SequenceNumber'
+
+    @staticmethod
+    def test_no_iter(zero):
+        with raises(TypeError) as info:
+            next(zero)
+        assert str(info.value) == "'SequenceNumber' object is not iterable"
+
+    @staticmethod
+    def test_iter_first(iter_sq):
+        assert next(iter_sq).value == 0
+
+    @staticmethod
+    def test_iter_second(iter_sq):
+        next(iter_sq)
+        assert next(iter_sq).value == 1
+
+    @staticmethod
+    def test_iter_last():
+        sq_num = iter(SequenceNumber(0xFFFFFFFF))
+        next(sq_num)
+        assert raises(StopIteration, next, sq_num)
 
 
 class TestStatusNumber:
     @fixture
     def one(self):
         return StatusNumber(1)
+
+    @fixture
+    def iter_st(self):
+        return iter(StatusNumber(1))
 
     @staticmethod
     def test_min_bytes(one):
@@ -145,15 +178,40 @@ class TestStatusNumber:
 
     @staticmethod
     def test_bellow():
-        assert raises(ValueError, StatusNumber, -1)
+        with raises(ValueError) as info:
+            StatusNumber(-1)
+        # TODO change message from Unsigned integer to StatusNumber
+        assert str(info.value) == 'Unsigned integer cannot be negative'
 
     @staticmethod
     def test_above():
-        assert raises(ValueError, StatusNumber, 0x1FFFFFFFF)
+        with raises(ValueError) as info:
+            StatusNumber(0x1FFFFFFFF)
+        assert str(info.value) == 'Unsigned integer out of supported range'
 
     @staticmethod
     def test_tag(one):
         assert one.tag == 'StatusNumber'
+
+    @staticmethod
+    def test_no_iter(one):
+        with raises(TypeError) as info:
+            next(one)
+        assert str(info.value) == "'StatusNumber' object is not iterable"
+
+    @staticmethod
+    def test_iter_first(iter_st):
+        assert next(iter_st).value == 2
+
+    @staticmethod
+    def test_iter_second(iter_st):
+        next(iter_st)
+        assert next(iter_st).value == 3
+
+    @staticmethod
+    def test_iter_last():
+        st_num = iter(StatusNumber(0xFFFFFFFF))
+        assert raises(StopIteration, next, st_num)
 
 
 class TestTimeAllowedToLive:
@@ -302,3 +360,9 @@ class TestAllData:
     @staticmethod
     def test_error_type():
         assert raises(TypeError, AllData, 1)
+
+    @staticmethod
+    def test_get_item():
+        true = Boolean(True)
+        all_data = AllData(Boolean(False), true)
+        assert all_data[1] == true
