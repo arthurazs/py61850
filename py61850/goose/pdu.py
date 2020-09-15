@@ -182,6 +182,8 @@ class ProtocolDataUnit(Base):
                  # TODO remove numOfDatSet from here, remove default value for AllData
                  number_of_data_set_entries: Optional[NumberOfDataSetEntries] = None, all_data: AllData = AllData(),
                  raw_value: bytes = None):
+        # TODO What if the user want's to exclude some unnecessary fields
+        # e.g. remove nds_com and test fields
         if raw_value:
             raise NotImplementedError
         else:
