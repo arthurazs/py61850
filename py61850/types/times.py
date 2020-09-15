@@ -73,7 +73,6 @@ class Quality(Generic):
 
     @property
     def time_accuracy(self) -> Union[int, str]:
-        # TODO Test this
         return 'Unspecified' if self._accuracy == 0x1F else self._accuracy
 
 

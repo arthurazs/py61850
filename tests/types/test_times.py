@@ -44,6 +44,9 @@ class TestQuality:
     def test_decode_accuracy(self, attr, byte):
         assert Quality(raw_value=byte).time_accuracy == attr[3]
 
+    def test_decode_accuracy_unspecified(self):
+        assert Quality(time_accuracy=0x1F).time_accuracy == 'Unspecified'
+
     # === EXCEPTIONS ===
     def test_decode_not_byte(self):
         assert raises(TypeError, Quality, raw_value='1')
