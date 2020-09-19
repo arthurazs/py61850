@@ -21,7 +21,6 @@ class VisibleString(Base):
         if len(value) == 0:
             return None
         elif 0 < len(value) <= self._max_length:
-            # TODO How should I limit other string lengths?
             return value.encode('utf8')
         raise ValueError('value out of supported length')
 

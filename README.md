@@ -22,18 +22,16 @@ nic.bind((argv[1], 0))
 
 from sansio61850.goose import Publisher
 from sansio61850.types import Boolean, VisibleString
-from sansio61850.types.integer import Signed, Unsigned
 
 
 ied = 'IED_Pub'
 ref = f'{ied}_CFG/LLN0'
-data = (Boolean(True), VisibleString('Content'), Signed(-5), Unsigned(6))
 publisher = Publisher(destination='01:0c:cd:01:00:13', vlan=False, app_id=1,
                       gcb_ref=f'{ref}$GO$GOOSE_SENDER', data_set=f'{ref}$MyDataSet',
-                      go_id=ied, all_data=data)
+                      go_id=ied, all_data=(Boolean(True), VisibleString('Content')))
 
-for st_num, goose in enumerate(publisher):
-    if st_num == 10:
+for sq_num, goose in enumerate(publisher):
+    if sq_num == 10:
         goose.pdu.all_data[1] = 'New Content'  # VisibleString
     nic.send(bytes(goose))
     sleep(goose.next_goose_timer)
