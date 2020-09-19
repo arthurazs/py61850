@@ -3,7 +3,7 @@ from pytest import fixture, raises
 from py61850.goose.pdu import AllData, ConfigurationRevision, DataSet, GooseControlBlockReference, GooseIdentifier
 from py61850.goose.pdu import GooseTimestamp, NeedsCommissioning, NumberOfDataSetEntries, ProtocolDataUnit
 from py61850.goose.pdu import SequenceNumber, StatusNumber, GooseTest, TimeAllowedToLive
-from py61850.types import Boolean
+from py61850.types import Boolean, VisibleString
 
 
 class TestProtocolDataUnit:
@@ -324,3 +324,14 @@ class TestProtocolDataUnit:
         iter_pdu.all_data[0].value = False
         next(iter_pdu)
         assert next(pdu).sequence_number.value == 1
+
+    @staticmethod
+    def test_pdu_above(cb_ref, ttl, dat_set, go_id, t, st_num, sq_num, go_test, conf_rev, nds_com):
+        with raises(ValueError) as info:
+            all_data = (VisibleString('a' * 255), VisibleString('a' * 255),
+                        VisibleString('a' * 255), VisibleString('a' * 255),
+                        VisibleString('a' * 255), VisibleString('a' * 99))
+            ProtocolDataUnit(cb_ref, ttl, dat_set, go_id, t,
+                             st_num, sq_num, go_test, conf_rev, nds_com,
+                             None, AllData(*all_data))
+        assert str(info.value) == "ProtocolDataUnit out of supported length"

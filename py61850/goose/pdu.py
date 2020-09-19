@@ -125,7 +125,6 @@ class NumberOfDataSetEntries(Unsigned):
 
 class AllData(Base):
     def __init__(self, *data: Base):
-        # TODO Take into account 1500 (Payload limit) - GOOSE Overhead
         (raw_value, number_of_entries), value = self._parse(data)
         if raw_value == b'':
             raw_value, value = None, None
@@ -250,11 +249,10 @@ class ProtocolDataUnit(Base):
                 # TODO Test
                 raise_type(name, type_class, type(value))
 
-    @staticmethod
-    def _encode(value: Tuple[GooseControlBlockReference, TimeAllowedToLive, DataSet, GooseIdentifier, GooseTimestamp,
+    def _encode(self,
+                value: Tuple[GooseControlBlockReference, TimeAllowedToLive, DataSet, GooseIdentifier, GooseTimestamp,
                              StatusNumber, SequenceNumber, GooseTest, ConfigurationRevision, NeedsCommissioning,
                              NumberOfDataSetEntries, AllData]) -> Tuple[bytes, NumberOfDataSetEntries]:
-
         ProtocolDataUnit._assert_type(value)
 
         (control_block_reference, time_allowed_to_live, data_set, goose_identifier, goose_timestamp,
@@ -268,6 +266,12 @@ class ProtocolDataUnit(Base):
 
         if number_of_data_set_entries.value != all_data.number_of_data_set_entries:
             raise ValueError('number_of_data_set_entries doest not match all_data number of entries')
+
+        if len(control_block_reference) + len(time_allowed_to_live) + len(data_set) + \
+                len(goose_identifier) + len(goose_timestamp) + len(status_number) + len(sequence_number) + \
+                len(test) + len(configuration_revision) + len(needs_commissioning) + \
+                len(number_of_data_set_entries) + len(all_data) > 1492:  # PDU limit
+            raise ValueError(f'{self.__class__.__name__} out of supported length')
 
         return \
             bytes(control_block_reference) + bytes(time_allowed_to_live) + bytes(data_set) + \
