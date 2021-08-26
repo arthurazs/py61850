@@ -86,6 +86,18 @@ Check [gridsoftware](http://www.gridsoftware.com).
 
 Frame Generator or GOOSE Emulator? *e.g.*, Should I enable starting a GOOSE from stnum 10 instead of 0?
 
+```python
+# TODO Test the time difference between both
+
+v_str = VisibleString.encode('arthur')
+assert v_str == b'\x8A\x06arthur'
+assert type(v_str) == bytes
+
+v_str = VisibleStringEncoder('arthur')
+assert bytes(v_str) == b'\x8A\x06arthur'
+assert type(v_str) == VisibleStringEncoder
+```
+
 ## Reference
 
 - https://www.sphinx-doc.org/en/1.8/usage/extensions/example_google.html#example-google
@@ -104,6 +116,9 @@ Frame Generator or GOOSE Emulator? *e.g.*, Should I enable starting a GOOSE from
 - Protection
 - IED Simm, simple, that sends a trip, and has gui (info tech ied sim)
 - Test bed with 3 substations? to study goose cascading, etc...
+- Use SCD to recreate all the IED instances
+- AMI
+- GOOSE, SV and MMS monitor
 
 ## GOOSE
 
